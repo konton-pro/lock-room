@@ -1,0 +1,21 @@
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsparser from "@typescript-eslint/parser";
+
+/** @type {import("eslint").Linter.Config[]} */
+export default [
+  {
+    files: ["src/**/*.ts"],
+    languageOptions: {
+      parser: tsparser,
+    },
+    plugins: {
+      "@typescript-eslint": tseslint,
+    },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
+  },
+];
