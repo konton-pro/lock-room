@@ -17,9 +17,11 @@ export const authService = {
 
   login: async (email: string, password: string): Promise<JwtPayload> => {
     const user = await authRepository.findByEmail(email);
+    
     if (!user) throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
 
     const valid = await Bun.password.verify(password, user.password);
+
     if (!valid)
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
 
