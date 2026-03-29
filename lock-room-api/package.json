@@ -10,9 +10,12 @@
     "db:migrate": "bunx drizzle-kit migrate"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "drizzle-orm": "^0.45.2",
     "elysia": "latest",
-    "pg": "^8.20.0"
+    "elysia-rate-limit": "^4.5.1",
+    "pg": "^8.20.0",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@types/pg": "^8.20.0",
