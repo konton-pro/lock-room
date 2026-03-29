@@ -1,11 +1,13 @@
 import { createId } from "@paralleldrive/cuid2";
 import {
   customType,
+  integer,
   pgTable,
   serial,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { users } from "@schema/users.schema";
 
 const bytea = customType<{ data: Buffer }>({
   dataType() {
@@ -19,7 +21,7 @@ export const vault = pgTable("vault", {
     .notNull()
     .unique()
     .$defaultFn(() => createId()),
-  userId: varchar("user_id", { length: 36 }).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   encryptedHeader: bytea("encrypted_header").notNull(),
   encryptedBody: bytea("encrypted_body").notNull(),
   clientIv: bytea("client_iv").notNull(),
@@ -30,3 +32,4 @@ export const vault = pgTable("vault", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
