@@ -5,5 +5,7 @@ export default defineConfig({
   schema: "./src/database/schema",
   out: "./src/database/migrations",
   dialect: "postgresql",
-  dbCredentials: databaseConfig,
+  dbCredentials: {
+    url: databaseConfig.connectionString,
+  },
 });
