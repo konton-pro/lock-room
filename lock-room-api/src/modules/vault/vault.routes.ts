@@ -9,6 +9,7 @@ import {
   retrieveVaultDocs,
   storeVaultDocs,
 } from "@modules/vault/vault.docs";
+import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const vaultRoutes = new Elysia({ prefix: "/vault" })
   .use(authGuard)
@@ -17,7 +18,7 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
     "/",
     async ({ body, userId, serverCrypto, set }) => {
       const item = await vaultService.store(body, userId, serverCrypto);
-      set.status = 201;
+      set.status = HTTP_STATUS.CREATED;
 
       return { cuid: item.cuid };
     },
@@ -41,7 +42,8 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
     "/:id",
     async ({ params, userId, set }) => {
       await vaultService.remove(params.id, userId);
-      set.status = 204;
+      
+      set.status = HTTP_STATUS.NO_CONTENT;
     },
     { ...vaultParamsSchema, ...deleteVaultDocs },
   );
