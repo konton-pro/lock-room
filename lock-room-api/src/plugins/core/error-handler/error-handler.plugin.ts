@@ -7,6 +7,7 @@ export const errorHandlerPlugin = new Elysia({
 }).onError(({ error, set }) => {
   if (error instanceof HttpError) {
     set.status = error.statusCode;
+
     return { message: error.message };
   }
 

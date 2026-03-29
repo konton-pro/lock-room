@@ -10,3 +10,5 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
   NO_CONTENT: 204,
 } as const;
+
+export type HttpStatusEntry = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
