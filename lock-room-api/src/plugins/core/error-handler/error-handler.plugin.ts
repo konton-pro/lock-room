@@ -4,7 +4,7 @@ import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const errorHandlerPlugin = new Elysia({
   name: "plugin:error-handler",
-}).onError(({ error, set }) => {
+}).onError({ as: "global" }, ({ error, set }) => {
   if (error instanceof HttpError) {
     set.status = error.statusCode;
 
