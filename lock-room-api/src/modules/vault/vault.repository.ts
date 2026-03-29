@@ -48,6 +48,7 @@ export const vaultRepository = {
       where: (u, { eq }) => eq(u.cuid, userCuid),
       columns: { id: true },
     });
+    
     if (!user) return;
 
     await db
