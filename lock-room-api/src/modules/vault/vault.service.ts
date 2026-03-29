@@ -16,8 +16,8 @@ export const vaultService = {
     );
     const bodyL2 = crypto.encrypt(Buffer.from(input.encryptedBody, "base64"));
 
-    return vaultRepository.create({
-      userId,
+    const item = await vaultRepository.create({
+      userCuid: userId,
       encryptedHeader: headerL2.encrypted,
       encryptedBody: bodyL2.encrypted,
       clientIv: Buffer.from(input.clientIv, "base64"),
@@ -26,6 +26,8 @@ export const vaultService = {
       serverBodyIv: bodyL2.iv,
       serverBodyTag: bodyL2.tag,
     });
+    if (!item) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
+    return item;
   },
 
   retrieve: async (cuid: string, userId: string, crypto: ServerCrypto) => {
@@ -33,7 +35,7 @@ export const vaultService = {
 
     if (!row) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
 
-    if (row.userId !== userId) throw new ForbiddenException(VAULT_ERRORS.FORBIDDEN);
+    if (row.user?.cuid !== userId) throw new ForbiddenException(VAULT_ERRORS.FORBIDDEN);
 
     let headerDecrypted: Buffer;
     let bodyDecrypted: Buffer;
@@ -63,7 +65,7 @@ export const vaultService = {
   },
 
   list: async (userId: string, crypto: ServerCrypto) => {
-    const rows = await vaultRepository.findAllByUserId(userId);
+    const rows = await vaultRepository.findAllByUserCuid(userId);
 
     return rows.map((row) => {
       let headerDecrypted: Buffer;
@@ -90,8 +92,9 @@ export const vaultService = {
   remove: async (cuid: string, userId: string) => {
     const row = await vaultRepository.findByCuid(cuid);
     if (!row) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
-    if (row.userId !== userId) throw new ForbiddenException(VAULT_ERRORS.FORBIDDEN);
 
+    if (row.user?.cuid !== userId) throw new ForbiddenException(VAULT_ERRORS.FORBIDDEN);
+    
     await vaultRepository.removeByCuid(cuid, userId);
   },
 };

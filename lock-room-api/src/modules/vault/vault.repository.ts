@@ -5,25 +5,53 @@ import type { CreateVaultData } from "./vault.types";
 
 export const vaultRepository = {
   create: async (data: CreateVaultData) => {
-    const [item] = await db.insert(vault).values(data).returning();
-    return item;
+    const user = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.cuid, data.userCuid),
+      columns: { id: true },
+    });
+
+    if (!user) return null;
+
+    const { userCuid: _, ...fields } = data;
+
+    const [item] = await db
+      .insert(vault)
+      .values({ ...fields, userId: user.id })
+      .returning();
+    
+      return item;
   },
 
   findByCuid: async (cuid: string) => {
-    const [item] = await db
-      .select()
-      .from(vault)
-      .where(eq(vault.cuid, cuid));
-    return item ?? null;
+    return (
+      (await db.query.vault.findFirst({
+        where: (v, { eq }) => eq(v.cuid, cuid),
+        with: { user: { columns: { cuid: true } } },
+      })) ?? null
+    );
   },
 
-  findAllByUserId: async (userId: string) => {
-    return db.select().from(vault).where(eq(vault.userId, userId));
+  findAllByUserCuid: async (userCuid: string) => {
+    const user = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.cuid, userCuid),
+      columns: { id: true },
+    });
+    if (!user) return [];
+
+    return db.query.vault.findMany({
+      where: (v, { eq }) => eq(v.userId, user.id),
+    });
   },
 
-  removeByCuid: async (cuid: string, userId: string) => {
+  removeByCuid: async (cuid: string, userCuid: string) => {
+    const user = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.cuid, userCuid),
+      columns: { id: true },
+    });
+    if (!user) return;
+
     await db
       .delete(vault)
-      .where(and(eq(vault.cuid, cuid), eq(vault.userId, userId)));
+      .where(and(eq(vault.cuid, cuid), eq(vault.userId, user.id)));
   },
 };

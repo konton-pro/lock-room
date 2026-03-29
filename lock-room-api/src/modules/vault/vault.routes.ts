@@ -16,8 +16,10 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
   .post(
     "/",
     async ({ body, userId, serverCrypto, set }) => {
+      
       const item = await vaultService.store(body, userId, serverCrypto);
       set.status = 201;
+
       return { cuid: item.cuid };
     },
     { ...storeVaultSchema, ...storeVaultDocs },

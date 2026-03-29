@@ -16,7 +16,7 @@ export type StoreVaultInput = {
 };
 
 export type CreateVaultData = {
-  userId: string;
+  userCuid: string;
   encryptedHeader: Buffer;
   encryptedBody: Buffer;
   clientIv: Buffer;
