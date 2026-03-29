@@ -1,9 +1,9 @@
 import { BadRequestException } from "@exceptions/bad-request.exception";
 import { ForbiddenException } from "@exceptions/forbidden.exception";
 import { NotFoundException } from "@exceptions/not-found.exception";
-import { vaultRepository } from "./vault.repository";
-import { VAULT_ERRORS } from "./vault.constants";
-import type { ServerCrypto, StoreVaultInput } from "./vault.types";
+import { vaultRepository } from "@modules/vault/vault.repository";
+import { VAULT_ERRORS } from "@modules/vault/vault.constants";
+import type { ServerCrypto, StoreVaultInput } from "@modules/vault/vault.types";
 
 export const vaultService = {
   store: async (

@@ -1,8 +1,8 @@
 import { ConflictException } from "@exceptions/conflict.exception";
 import { UnauthorizedException } from "@exceptions/unauthorized.exception";
-import { authRepository } from "./auth.repository";
-import { AUTH_ERRORS } from "./auth.constants";
-import type { JwtPayload } from "./auth.types";
+import { authRepository } from "@modules/auth/auth.repository";
+import { AUTH_ERRORS } from "@modules/auth/auth.constants";
+import type { JwtPayload } from "@modules/auth/auth.types";
 
 export const authService = {
   register: async (email: string, password: string) => {

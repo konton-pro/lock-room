@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@database/index";
 import { vault } from "@schema/vault.schema";
-import type { CreateVaultData } from "./vault.types";
+import type { CreateVaultData } from "@modules/vault/vault.types";
 
 export const vaultRepository = {
   create: async (data: CreateVaultData) => {
@@ -48,7 +48,7 @@ export const vaultRepository = {
       where: (u, { eq }) => eq(u.cuid, userCuid),
       columns: { id: true },
     });
-    
+
     if (!user) return;
 
     await db
