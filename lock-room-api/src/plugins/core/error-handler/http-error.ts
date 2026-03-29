@@ -13,4 +13,8 @@ export class HttpError extends Error {
 
     this.name = "HttpError";
   }
+
+  toResponse(): { message: string } {
+    return { message: this.message };
+  }
 }

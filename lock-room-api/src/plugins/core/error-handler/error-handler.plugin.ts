@@ -1,24 +1,19 @@
 import { Elysia } from "elysia";
-import { HttpError } from "@plugins/core/error-handler/http-error";
-import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
+import { errorMappers } from "@plugins/core/error-handler/error-handler.mapper";
 import { serverConfig } from "@configs/server.config";
 
 export const errorHandlerPlugin = new Elysia({
   name: "plugin:error-handler",
 }).onError({ as: "global" }, ({ error, set }) => {
-  if (error instanceof HttpError) {
-    set.status = error.statusCode;
+  const mapper = errorMappers.find(({ match }) => match(error))!;
+  const { status, body } = mapper.map(error);
 
-    return {
-      message: error.message,
-      ...(!serverConfig.isProduction && { stack: error.stack }),
-    };
-  }
-
-  set.status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+  set.status = status;
 
   return {
-    message: "Internal server error",
-    ...(!serverConfig.isProduction && { stack: error instanceof Error ? error.stack : undefined }),
+    ...body,
+    ...(!serverConfig.isProduction && {
+      stack: error instanceof Error ? error.stack : undefined,
+    }),
   };
 });
