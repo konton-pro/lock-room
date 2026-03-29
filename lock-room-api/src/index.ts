@@ -8,14 +8,18 @@ import { loggerPlugin } from "@plugins/infra/logger/logger.plugin";
 import { swaggerPlugin } from "@plugins/docs/swagger/swagger.plugin";
 import { modulesRoutes } from "./modules/modules.routes";
 
-const app = new Elysia()
+export const app = new Elysia()
   .use(errorHandlerPlugin)
   .use(corsPlugin)
   .use(rateLimitPlugin)
   .use(xssPlugin)
   .use(loggerPlugin)
   .use(swaggerPlugin)
-  .use(modulesRoutes)
-  .listen(serverConfig.port);
+  .use(modulesRoutes);
 
-console.log(`Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+if (import.meta.main) {
+  app.listen(serverConfig.port);
+  console.log(
+    `Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+  );
+}
