@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { HttpError } from "./http-error";
-import { HTTP_STATUS } from "./http-status.constants";
+import { HttpError } from "@plugins/core/error-handler/http-error";
+import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const errorHandlerPlugin = new Elysia({
   name: "plugin:error-handler",
