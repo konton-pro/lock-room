@@ -23,6 +23,6 @@ export const authService = {
     if (!valid)
       throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
 
-    return { sub: user.id, email: user.email };
+    return { sub: user.cuid, email: user.email };
   },
 };
