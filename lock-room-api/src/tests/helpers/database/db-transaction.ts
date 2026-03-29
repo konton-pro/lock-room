@@ -1,21 +1,21 @@
-import { db } from '@database/index';
-import { afterEach, beforeEach, afterAll } from 'bun:test';
-
-const pool = (db as { _client?: { end: () => Promise<void> } })._client;
+import { afterEach, beforeEach } from "bun:test";
+import type { PoolClient } from "pg";
+import { pool } from "@database/connection";
+import { db } from "@database/index";
 
 export function dbTransaction() {
+  let client: PoolClient;
+
   beforeEach(async () => {
-    await db.execute('BEGIN');
+    client = await pool.connect();
+    await client.query("BEGIN");
+    (db.session as any).client = client;
   });
 
   afterEach(async () => {
-    await db.execute('ROLLBACK');
-  });
-
-  afterAll(async () => {
-    if (pool && typeof pool.end === 'function') {
-      await pool.end();
-    }
+    await client.query("ROLLBACK");
+    client.release();
+    (db.session as any).client = pool;
   });
 }
 

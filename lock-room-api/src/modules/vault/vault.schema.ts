@@ -10,6 +10,6 @@ export const storeVaultSchema = {
 
 export const vaultParamsSchema = {
   params: z.object({
-    id: z.string().uuid(),
+    id: z.string().cuid2(),
   }),
 };
