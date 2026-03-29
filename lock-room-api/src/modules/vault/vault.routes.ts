@@ -17,12 +17,14 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
   .post(
     "/",
     async ({ body, userId, serverCrypto, set }) => {
-      const item = await vaultService.store(body, userId, serverCrypto);
-      set.status = HTTP_STATUS.CREATED;
+      const data = storeVaultSchema.body.parse(body);
 
+      const item = await vaultService.store(data, userId, serverCrypto);
+      
+      set.status = HTTP_STATUS.CREATED;
       return { cuid: item.cuid };
     },
-    { ...storeVaultSchema, ...storeVaultDocs },
+    storeVaultDocs,
   )
   .get(
     "/",
@@ -34,16 +36,17 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
   .get(
     "/:id",
     async ({ params, userId, serverCrypto }) => {
-      return vaultService.retrieve(params.id, userId, serverCrypto);
+      const { id } = vaultParamsSchema.params.parse(params);
+      return vaultService.retrieve(id, userId, serverCrypto);
     },
-    { ...vaultParamsSchema, ...retrieveVaultDocs },
+    retrieveVaultDocs,
   )
   .delete(
     "/:id",
     async ({ params, userId, set }) => {
-      await vaultService.remove(params.id, userId);
-      
+      const { id } = vaultParamsSchema.params.parse(params);
+      await vaultService.remove(id, userId);
       set.status = HTTP_STATUS.NO_CONTENT;
     },
-    { ...vaultParamsSchema, ...deleteVaultDocs },
+    deleteVaultDocs,
   );

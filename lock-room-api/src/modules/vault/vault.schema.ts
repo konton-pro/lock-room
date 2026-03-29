@@ -1,15 +1,15 @@
-import { t } from "elysia";
+import { z } from "zod";
 
 export const storeVaultSchema = {
-  body: t.Object({
-    encryptedHeader: t.String(),
-    encryptedBody: t.String(),
-    clientIv: t.String(),
+  body: z.object({
+    encryptedHeader: z.string(),
+    encryptedBody: z.string(),
+    clientIv: z.string(),
   }),
 };
 
 export const vaultParamsSchema = {
-  params: t.Object({
-    id: t.String({ format: "uuid" }),
+  params: z.object({
+    id: z.string().uuid(),
   }),
 };

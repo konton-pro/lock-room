@@ -11,20 +11,20 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
   .post(
     "/register",
     async ({ body, set }) => {
-      const user = await authService.register(body.email, body.password);
+      const data = registerSchema.body.parse(body);
+      const user = await authService.register(data.email, data.password);
       set.status = 201;
       return { id: user.cuid, email: user.email };
     },
-    { ...registerSchema, ...registerDocs },
+    registerDocs,
   )
   .post(
     "/login",
     async ({ body, jwt }) => {
-      const payload = await authService.login(body.email, body.password);
-
+      const data = loginSchema.body.parse(body);
+      const payload = await authService.login(data.email, data.password);
       const token = await jwt.sign(payload);
-
       return { token };
     },
-    { ...loginSchema, ...loginDocs },
+    loginDocs,
   );
