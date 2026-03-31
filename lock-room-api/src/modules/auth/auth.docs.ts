@@ -8,11 +8,11 @@ export const registerDocs = {
       content: {
         "application/json": {
           schema: {
-            type: "object",
+            type: "object" as const,
             required: ["email", "password"],
             properties: {
-              email: { type: "string", format: "email" },
-              password: { type: "string", minLength: 8 },
+              email: { type: "string" as const, format: "email" },
+              password: { type: "string" as const, minLength: 8 },
             },
           },
           example: {
@@ -28,10 +28,10 @@ export const registerDocs = {
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
-                id: { type: "string" },
-                email: { type: "string", format: "email" },
+                id: { type: "string" as const },
+                email: { type: "string" as const, format: "email" },
               },
             },
             example: {
@@ -58,11 +58,11 @@ export const loginDocs = {
       content: {
         "application/json": {
           schema: {
-            type: "object",
+            type: "object" as const,
             required: ["email", "password"],
             properties: {
-              email: { type: "string", format: "email" },
-              password: { type: "string" },
+              email: { type: "string" as const, format: "email" },
+              password: { type: "string" as const },
             },
           },
           example: {
@@ -78,9 +78,9 @@ export const loginDocs = {
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
-                token: { type: "string" },
+                token: { type: "string" as const },
               },
             },
             example: {

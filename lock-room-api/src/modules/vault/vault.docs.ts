@@ -12,19 +12,19 @@ export const storeVaultDocs = {
       content: {
         "application/json": {
           schema: {
-            type: "object",
+            type: "object" as const,
             required: ["encryptedHeader", "encryptedBody", "clientIv"],
             properties: {
               encryptedHeader: {
-                type: "string",
+                type: "string" as const,
                 description: "Client-side encrypted header (base64)",
               },
               encryptedBody: {
-                type: "string",
+                type: "string" as const,
                 description: "Client-side encrypted body (base64)",
               },
               clientIv: {
-                type: "string",
+                type: "string" as const,
                 description: "Client-side IV used for encryption (base64)",
               },
             },
@@ -43,9 +43,9 @@ export const storeVaultDocs = {
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
-                cuid: { type: "string" },
+                cuid: { type: "string" as const },
               },
             },
             example: {
@@ -73,22 +73,22 @@ export const retrieveVaultDocs = {
         content: {
           "application/json": {
             schema: {
-              type: "object",
+              type: "object" as const,
               properties: {
-                cuid: { type: "string" },
+                cuid: { type: "string" as const },
                 encryptedHeader: {
-                  type: "string",
+                  type: "string" as const,
                   description: "Client-side encrypted header (base64)",
                 },
                 encryptedBody: {
-                  type: "string",
+                  type: "string" as const,
                   description: "Client-side encrypted body (base64)",
                 },
                 clientIv: {
-                  type: "string",
+                  type: "string" as const,
                   description: "Client-side IV (base64)",
                 },
-                createdAt: { type: "string", format: "date-time" },
+                createdAt: { type: "string" as const, format: "date-time" },
               },
             },
             example: {
@@ -121,20 +121,20 @@ export const listVaultDocs = {
         content: {
           "application/json": {
             schema: {
-              type: "array",
+              type: "array" as const,
               items: {
-                type: "object",
+                type: "object" as const,
                 properties: {
-                  cuid: { type: "string" },
+                  cuid: { type: "string" as const },
                   encryptedHeader: {
-                    type: "string",
+                    type: "string" as const,
                     description: "Client-side encrypted header (base64)",
                   },
                   clientIv: {
-                    type: "string",
+                    type: "string" as const,
                     description: "Client-side IV (base64)",
                   },
-                  createdAt: { type: "string", format: "date-time" },
+                  createdAt: { type: "string" as const, format: "date-time" },
                 },
               },
             },
