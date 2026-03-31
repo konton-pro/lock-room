@@ -9,13 +9,15 @@ export const registerDocs = {
         "application/json": {
           schema: {
             type: "object" as const,
-            required: ["email", "password"],
+            required: ["name", "email", "password"],
             properties: {
+              name: { type: "string" as const, minLength: 1 },
               email: { type: "string" as const, format: "email" },
               password: { type: "string" as const, minLength: 8 },
             },
           },
           example: {
+            name: "John Doe",
             email: "user@example.com",
             password: "strongpassword123",
           },

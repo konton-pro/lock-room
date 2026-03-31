@@ -8,10 +8,10 @@ export const authRepository = {
     return user ?? null;
   },
 
-  create: async (email: string, hashedPassword: string) => {
+  create: async (name: string, email: string, hashedPassword: string) => {
     const [user] = await db
       .insert(users)
-      .values({ email, password: hashedPassword })
+      .values({ name, email, password: hashedPassword })
       .returning();
     return user;
   },

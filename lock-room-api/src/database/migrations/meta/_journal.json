@@ -8,6 +8,13 @@
       "when": 1774758398703,
       "tag": "0000_hesitant_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774975922260,
+      "tag": "0001_typical_ultimatum",
+      "breakpoints": true
     }
   ]
 }

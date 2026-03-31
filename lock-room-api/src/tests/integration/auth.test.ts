@@ -21,9 +21,11 @@ describe("POST /auth/register", () => {
   dbTransaction();
 
   it("deve registrar um usuário e retornar 201", async () => {
+    const name = faker.person.fullName();
     const email = faker.internet.email();
 
     const res = await post("/auth/register", {
+      name,
       email,
       password: "password123",
     });
@@ -39,6 +41,7 @@ describe("POST /auth/register", () => {
     const [user] = await new UserFactory().create();
 
     const res = await post("/auth/register", {
+      name: faker.person.fullName(),
       email: user!.email,
       password: "password123",
     });
@@ -51,6 +54,7 @@ describe("POST /auth/register", () => {
 
   it("deve retornar 422 para email inválido", async () => {
     const res = await post("/auth/register", {
+      name: faker.person.fullName(),
       email: "not-an-email",
       password: "password123",
     });
@@ -62,8 +66,23 @@ describe("POST /auth/register", () => {
     expect(data.errors[0].campo).toBe("email");
   });
 
+  it("deve retornar 422 para nome vazio", async () => {
+    const res = await post("/auth/register", {
+      name: "",
+      email: faker.internet.email(),
+      password: "password123",
+    });
+
+    const data = await res.json();
+
+    expect(res.status).toBe(422);
+    expect(data).toHaveProperty("errors");
+    expect(data.errors[0].campo).toBe("name");
+  });
+
   it("deve retornar 422 para senha com menos de 8 caracteres", async () => {
     const res = await post("/auth/register", {
+      name: faker.person.fullName(),
       email: faker.internet.email(),
       password: "short",
     });

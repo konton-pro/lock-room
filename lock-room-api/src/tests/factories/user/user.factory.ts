@@ -29,6 +29,7 @@ export class UserFactory {
 
     const inserted = await db.insert(users).values(rows).returning({
       cuid: users.cuid,
+      name: users.name,
       email: users.email,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
@@ -42,6 +43,7 @@ export class UserFactory {
 
   protected definition(): Required<UserOverrides> {
     return {
+      name: faker.person.fullName(),
       email: faker.internet.email(),
       password: faker.internet.password({ length: 12 }),
     };

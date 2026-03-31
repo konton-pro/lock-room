@@ -12,7 +12,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     "/register",
     async ({ body, set }) => {
       const data = registerSchema.body.parse(body);
-      const user = await authService.register(data.email, data.password);
+      const user = await authService.register(data.name, data.email, data.password);
       set.status = 201;
       return { id: user.cuid, email: user.email };
     },

@@ -5,14 +5,14 @@ import { AUTH_ERRORS } from "@modules/auth/auth.constants";
 import type { JwtPayload } from "@modules/auth/auth.types";
 
 export const authService = {
-  register: async (email: string, password: string) => {
+  register: async (name: string, email: string, password: string) => {
     const existing = await authRepository.findByEmail(email);
 
     if (existing) throw new ConflictException(AUTH_ERRORS.EMAIL_ALREADY_IN_USE);
 
     const hashedPassword = await Bun.password.hash(password);
 
-    return authRepository.create(email, hashedPassword);
+    return authRepository.create(name, email, hashedPassword);
   },
 
   login: async (email: string, password: string): Promise<JwtPayload> => {
