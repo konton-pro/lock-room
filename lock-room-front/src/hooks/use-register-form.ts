@@ -3,16 +3,19 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { authMutations } from '@/queries/auth'
 
+const validateName = (value: string) => value.trim().length >= 1
+
 const validateEmail = (value: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
 const validatePassword = (value: string) => value.length >= 8
 
 export const useRegisterForm = () => {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [touched, setTouched] = useState({ email: false, password: false })
+  const [touched, setTouched] = useState({ name: false, email: false, password: false })
   const navigate = useNavigate()
 
   const { mutate: registerUser, isPending, isError, reset } = useMutation({
@@ -21,11 +24,13 @@ export const useRegisterForm = () => {
   })
 
   const errors = {
+    name: touched.name && !validateName(name) ? 'NAME_REQUIRED' : null,
     email: touched.email && !validateEmail(email) ? 'INVALID_EMAIL_FORMAT' : null,
     password: touched.password && !validatePassword(password) ? 'MIN_8_CHARS_REQUIRED' : null,
   }
 
   const checks = {
+    name: validateName(name),
     email: email.length > 0 && validateEmail(email),
     password: validatePassword(password),
   }
@@ -39,14 +44,15 @@ export const useRegisterForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setTouched({ email: true, password: true })
-    if (!validateEmail(email) || !validatePassword(password)) return
-    registerUser({ email, password })
+    setTouched({ name: true, email: true, password: true })
+    if (!validateName(name) || !validateEmail(email) || !validatePassword(password)) return
+    registerUser({ name, email, password })
   }
 
-  const isReady = validateEmail(email) && validatePassword(password)
+  const isReady = validateName(name) && validateEmail(email) && validatePassword(password)
 
   return {
+    name,
     email,
     password,
     showPassword,
@@ -56,6 +62,7 @@ export const useRegisterForm = () => {
     isReady,
     errors,
     checks,
+    onNameChange: handleFieldChange(setName, 'name'),
     onEmailChange: handleFieldChange(setEmail, 'email'),
     onPasswordChange: handleFieldChange(setPassword, 'password'),
     handleSubmit,

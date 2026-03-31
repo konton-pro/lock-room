@@ -1,7 +1,10 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
 export default function Header() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isAuthPage = pathname === '/login' || pathname === '/register'
+
   return (
     <header
       className="sticky top-0 z-50 border-b"
@@ -20,20 +23,22 @@ export default function Header() {
           [ <ScrambleText>LOCK-ROOM</ScrambleText> ]
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
-          {(['FEATURES', 'ARCHITECTURE', 'SECURITY'] as const).map((label) => (
-            <a
-              key={label}
-              href={`#${label.toLowerCase()}`}
-              className="label-tag transition-colors"
-              style={{ color: 'var(--text-secondary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-            >
-              <ScrambleText>{label}</ScrambleText>
-            </a>
-          ))}
-        </nav>
+        {!isAuthPage && (
+          <nav className="hidden md:flex items-center gap-8">
+            {(['FEATURES', 'ARCHITECTURE', 'SECURITY'] as const).map((label) => (
+              <a
+                key={label}
+                href={`#${label.toLowerCase()}`}
+                className="label-tag transition-colors"
+                style={{ color: 'var(--text-secondary)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              >
+                <ScrambleText>{label}</ScrambleText>
+              </a>
+            ))}
+          </nav>
+        )}
 
         <div className="flex items-center gap-3">
           <Link to="/login" className="btn-ghost text-xs">

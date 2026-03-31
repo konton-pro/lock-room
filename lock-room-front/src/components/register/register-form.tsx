@@ -29,6 +29,7 @@ const CheckRow = ({ ok, label }: { ok: boolean; label: string }) => (
 
 export const RegisterForm = () => {
   const {
+    name,
     email,
     password,
     showPassword,
@@ -38,6 +39,7 @@ export const RegisterForm = () => {
     isReady,
     errors,
     checks,
+    onNameChange,
     onEmailChange,
     onPasswordChange,
     handleSubmit,
@@ -97,6 +99,51 @@ export const RegisterForm = () => {
             <div
               className="relative"
               style={{
+                border: `1px solid ${errors.name ? '#ef4444' : 'var(--border-strong)'}`,
+                background: 'var(--surface)',
+                transition: 'border-color 200ms ease',
+              }}
+            >
+              <span
+                className="absolute top-0 left-4 label-tag px-1"
+                style={{
+                  transform: 'translateY(-50%)',
+                  background: 'var(--bg)',
+                  color: errors.name ? '#ef4444' : 'var(--text-muted)',
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.18em',
+                  transition: 'color 200ms ease',
+                }}
+              >
+                INPUT_DISPLAY_NAME
+              </span>
+              <div className="flex items-center gap-2 px-4 py-4">
+                <span className="flex-shrink-0 text-sm" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  {'>'}
+                </span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => onNameChange(e.target.value)}
+                  placeholder="YOUR_NAME"
+                  autoComplete="name"
+                  autoFocus
+                  className="flex-1 bg-transparent outline-none text-sm tracking-widest uppercase"
+                  style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
+                />
+              </div>
+            </div>
+            {errors.name && (
+              <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
+                [ERROR] {errors.name}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div
+              className="relative"
+              style={{
                 border: `1px solid ${errors.email ? '#ef4444' : 'var(--border-strong)'}`,
                 background: 'var(--surface)',
                 transition: 'border-color 200ms ease',
@@ -125,7 +172,6 @@ export const RegisterForm = () => {
                   onChange={(e) => onEmailChange(e.target.value)}
                   placeholder="USER@DOMAIN.COM"
                   autoComplete="email"
-                  autoFocus
                   className="flex-1 bg-transparent outline-none text-sm tracking-widest uppercase"
                   style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
                 />

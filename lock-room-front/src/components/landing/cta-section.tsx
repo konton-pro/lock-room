@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
 export const CtaSection = () => (
@@ -36,9 +37,9 @@ export const CtaSection = () => (
         </p>
 
         <div className="flex flex-wrap justify-center gap-4 mt-4">
-          <a href="#" className="btn-primary text-xs">
+          <Link to="/login" className="btn-primary text-xs">
             [ <ScrambleText>INITIALIZE_SESSION</ScrambleText> ]
-          </a>
+          </Link>
         </div>
 
         <div
