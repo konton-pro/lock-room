@@ -26,8 +26,6 @@ export const vaultService = {
       serverBodyIv: bodyL2.iv,
       serverBodyTag: bodyL2.tag,
     });
-
-    if (!item) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
     
     return item;
   },
