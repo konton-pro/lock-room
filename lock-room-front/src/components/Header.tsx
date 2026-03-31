@@ -35,9 +35,14 @@ export default function Header() {
           ))}
         </nav>
 
-        <Link to="/login" className="btn-ghost text-xs">
-          [ <ScrambleText>GET_ACCESS</ScrambleText> ]
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/login" className="btn-ghost text-xs">
+            [ <ScrambleText>ACCESS_VAULT</ScrambleText> ]
+          </Link>
+          <Link to="/register" className="btn-primary text-xs">
+            [ <ScrambleText>GET_ACCESS</ScrambleText> ]
+          </Link>
+        </div>
       </div>
     </header>
   )

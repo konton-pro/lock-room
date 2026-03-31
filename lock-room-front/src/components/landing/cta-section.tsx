@@ -39,9 +39,6 @@ export const CtaSection = () => (
           <a href="#" className="btn-primary text-xs">
             [ <ScrambleText>INITIALIZE_SESSION</ScrambleText> ]
           </a>
-          <a href="#" className="btn-ghost text-xs">
-            [ <ScrambleText>RECOVERY_KEY</ScrambleText> ]
-          </a>
         </div>
 
         <div
