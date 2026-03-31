@@ -11,7 +11,7 @@ export const useLoginForm = () => {
 
   const { mutate: login, isPending, isError, reset } = useMutation({
     ...authMutations.login(),
-    onSuccess: () => navigate({ to: '/' }),
+    onSuccess: () => navigate({ to: '/dashboard' }),
   })
 
   const handleFieldChange = (setter: (v: string) => void) => (value: string) => {
