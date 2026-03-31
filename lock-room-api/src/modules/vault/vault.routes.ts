@@ -37,6 +37,7 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
     "/:id",
     async ({ params, userId, serverCrypto }) => {
       const { id } = vaultParamsSchema.params.parse(params);
+      
       return vaultService.retrieve(id, userId, serverCrypto);
     },
     retrieveVaultDocs,
@@ -45,7 +46,9 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
     "/:id",
     async ({ params, userId, set }) => {
       const { id } = vaultParamsSchema.params.parse(params);
+
       await vaultService.remove(id, userId);
+
       set.status = HTTP_STATUS.NO_CONTENT;
     },
     deleteVaultDocs,
