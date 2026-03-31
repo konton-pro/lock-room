@@ -93,7 +93,7 @@ export const vaultService = {
     const row = await vaultRepository.findByCuid(cuid);
     if (!row) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
 
-    if (row.user?.cuid !== userId) throw new ForbiddenException(VAULT_ERRORS.FORBIDDEN);
+    if (row.user?.cuid !== userId) throw new NotFoundException(VAULT_ERRORS.NOT_FOUND);
     
     await vaultRepository.removeByCuid(cuid, userId);
   },

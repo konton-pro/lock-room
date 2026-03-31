@@ -202,15 +202,15 @@ describe("DELETE /vault/:id", () => {
     expect(res.status).toBe(401);
   });
 
-  it("deve retornar 403 ao deletar item de outro usuário", async () => {
+  it("deve retornar 404 ao deletar item de outro usuário", async () => {
     const [otherUser] = await new UserFactory().create();
     const otherToken = await authHelper.getToken(otherUser!);
 
     const res = await del(`/vault/${cuid}`, otherToken);
     const data = await res.json();
 
-    expect(res.status).toBe(403);
-    expect(data.message).toBe(VAULT_ERRORS.FORBIDDEN);
+    expect(res.status).toBe(404);
+    expect(data.message).toBe(VAULT_ERRORS.NOT_FOUND);
   });
 
   it("deve retornar 404 para item inexistente", async () => {
