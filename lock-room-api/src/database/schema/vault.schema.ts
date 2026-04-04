@@ -47,4 +47,3 @@ export const vaultRelations = relations(vault, ({ one }) => ({
     references: [users.id],
   }),
 }));
-

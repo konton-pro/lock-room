@@ -1,6 +1,9 @@
 import { Elysia } from "elysia";
 import { logger } from "@plugins/infra/logger/logger";
-import { sanitizeHeaders, parseBody } from "@plugins/infra/logger/logger.helpers";
+import {
+  sanitizeHeaders,
+  parseBody,
+} from "@plugins/infra/logger/logger.helpers";
 
 export const loggerPlugin = new Elysia({ name: "plugin:logger" })
   .decorate("logger", logger)
@@ -33,7 +36,12 @@ export const loggerPlugin = new Elysia({ name: "plugin:logger" })
     }
 
     logger.warn(
-      { method: request.method, url: request.url, status, message: error instanceof Error ? error.message : String(error) },
+      {
+        method: request.method,
+        url: request.url,
+        status,
+        message: error instanceof Error ? error.message : String(error),
+      },
       "client error",
     );
   });

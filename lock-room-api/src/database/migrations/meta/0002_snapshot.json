@@ -1,9 +1,111 @@
 {
-  "id": "fc294c57-754d-4bcb-86f1-04eabacbbecb",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "5f8a482e-70c9-479f-9585-8bead35ce65a",
+  "prevId": "62ae656c-d320-40be-b1d0-73702785e479",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.recovery_keys": {
+      "name": "recovery_keys",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cuid": {
+          "name": "cuid",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_payload": {
+          "name": "encrypted_payload",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_iv": {
+          "name": "client_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_tag": {
+          "name": "client_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_iv": {
+          "name": "server_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_tag": {
+          "name": "server_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recovery_key_hash": {
+          "name": "recovery_key_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "recovery_keys_user_id_users_id_fk": {
+          "name": "recovery_keys_user_id_users_id_fk",
+          "tableFrom": "recovery_keys",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "recovery_keys_cuid_unique": {
+          "name": "recovery_keys_cuid_unique",
+          "nullsNotDistinct": false,
+          "columns": ["cuid"]
+        },
+        "recovery_keys_user_id_unique": {
+          "name": "recovery_keys_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["user_id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -17,6 +119,12 @@
         "cuid": {
           "name": "cuid",
           "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },

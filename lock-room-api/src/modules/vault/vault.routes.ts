@@ -2,7 +2,10 @@ import { Elysia } from "elysia";
 import { authGuard } from "@plugins/auth/jwt/jwt.plugin";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { vaultService } from "@modules/vault/vault.service";
-import { storeVaultSchema, vaultParamsSchema } from "@modules/vault/vault.schema";
+import {
+  storeVaultSchema,
+  vaultParamsSchema,
+} from "@modules/vault/vault.schema";
 import {
   deleteVaultDocs,
   listVaultDocs,
@@ -20,7 +23,7 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
       const data = storeVaultSchema.body.parse(body);
 
       const item = await vaultService.store(data, userId, serverCrypto);
-      
+
       set.status = HTTP_STATUS.CREATED;
       return { cuid: item.cuid };
     },
@@ -37,7 +40,7 @@ export const vaultRoutes = new Elysia({ prefix: "/vault" })
     "/:id",
     async ({ params, userId, serverCrypto }) => {
       const { id } = vaultParamsSchema.params.parse(params);
-      
+
       return vaultService.retrieve(id, userId, serverCrypto);
     },
     retrieveVaultDocs,

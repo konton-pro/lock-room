@@ -9,7 +9,9 @@ import { authHelper } from "@tests/helpers/modules/auth.helper";
 import { VAULT_ERRORS } from "@modules/vault/vault.constants";
 
 const vaultPayload = () => ({
-  encryptedHeader: Buffer.from(faker.string.alphanumeric(32)).toString("base64"),
+  encryptedHeader: Buffer.from(faker.string.alphanumeric(32)).toString(
+    "base64",
+  ),
   encryptedBody: Buffer.from(faker.string.alphanumeric(64)).toString("base64"),
   clientIv: Buffer.alloc(12).toString("base64"),
 });
@@ -71,7 +73,9 @@ describe("POST /vault", () => {
     const [user] = await new UserFactory().create();
     const token = await authHelper.getToken(user!);
 
-    const res = await post("/vault", token, { encryptedHeader: "only-one-field" });
+    const res = await post("/vault", token, {
+      encryptedHeader: "only-one-field",
+    });
     const data = await res.json();
 
     expect(res.status).toBe(422);

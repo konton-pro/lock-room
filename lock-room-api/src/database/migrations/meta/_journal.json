@@ -15,6 +15,13 @@
       "when": 1774975922260,
       "tag": "0001_typical_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775345084354,
+      "tag": "0002_blushing_nebula",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,14 @@
 import { createId } from "@paralleldrive/cuid2";
-import { index, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  pgTable,
+  serial,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { vault } from "@schema/vault.schema";
+import { recoveryKeys } from "@schema/recovery-keys.schema";
 
 export const users = pgTable(
   "users",
@@ -20,6 +27,7 @@ export const users = pgTable(
   (table) => [index("users_email_idx").on(table.email)],
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   vault: many(vault),
+  recoveryKey: one(recoveryKeys),
 }));

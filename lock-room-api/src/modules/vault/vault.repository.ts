@@ -18,8 +18,8 @@ export const vaultRepository = {
       .insert(vault)
       .values({ ...fields, userId: user.id })
       .returning();
-    
-      return item;
+
+    return item;
   },
 
   findByCuid: async (cuid: string) => {

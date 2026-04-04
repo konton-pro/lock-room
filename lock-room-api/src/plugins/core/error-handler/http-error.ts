@@ -3,10 +3,7 @@ import type { HttpStatusEntry } from "@plugins/core/error-handler/http-status.co
 export class HttpError extends Error {
   readonly statusCode: HttpStatusEntry;
 
-  constructor(
-    statusCode: HttpStatusEntry,
-    message: string,
-  ) {
+  constructor(statusCode: HttpStatusEntry, message: string) {
     super(message);
 
     this.statusCode = statusCode;

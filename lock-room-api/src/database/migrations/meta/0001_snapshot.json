@@ -76,16 +76,12 @@
         "users_cuid_unique": {
           "name": "users_cuid_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "cuid"
-          ]
+          "columns": ["cuid"]
         },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -193,12 +189,8 @@
           "name": "vault_user_id_users_id_fk",
           "tableFrom": "vault",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -208,9 +200,7 @@
         "vault_cuid_unique": {
           "name": "vault_cuid_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "cuid"
-          ]
+          "columns": ["cuid"]
         }
       },
       "policies": {},

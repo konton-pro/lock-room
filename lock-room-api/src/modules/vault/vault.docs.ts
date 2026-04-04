@@ -158,7 +158,8 @@ export const deleteVaultDocs = {
   detail: {
     tags: ["Vault"],
     summary: "Delete vault item",
-    description: "Permanently delete a vault item. This action cannot be undone.",
+    description:
+      "Permanently delete a vault item. This action cannot be undone.",
     security,
     responses: {
       204: { description: "Item deleted" },

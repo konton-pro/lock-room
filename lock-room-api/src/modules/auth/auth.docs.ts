@@ -86,7 +86,8 @@ export const loginDocs = {
               },
             },
             example: {
-              token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ejRhOTh4eGF0OTZpd3M5em1icmdqM2EifQ.signature",
+              token:
+                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ejRhOTh4eGF0OTZpd3M5em1icmdqM2EifQ.signature",
             },
           },
         },
