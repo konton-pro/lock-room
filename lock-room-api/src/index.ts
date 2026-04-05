@@ -18,7 +18,7 @@ export const app = new Elysia()
   .use(modulesRoutes);
 
 if (import.meta.main) {
-  app.listen(serverConfig.port);
+  app.listen({ port: serverConfig.port, hostname: "0.0.0.0" });
   console.log(
     `Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
   );
