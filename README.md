@@ -65,11 +65,9 @@ During registration, a **256-bit recovery key** is generated. This key:
 
 ## API
 
-The API is publicly accessible at `https://lockroom.api.konton.pro`. Swagger documentation is available at:
+The API is publicly accessible at `https://lockroom.api.konton.pro`.
 
-```
-https://lockroom.api.konton.pro/swagger
-```
+> Swagger documentation is only available in development (`NODE_ENV !== "production"`). To explore the API locally, run the server in dev mode and access `http://localhost:3001/docs`.
 
 ### Endpoints
 
@@ -120,6 +118,7 @@ DATABASE_URL=postgres://user:password@host:5432/lockroom
 # Ports
 API_PORT=3001
 FRONT_PORT=3000
+HOST=0.0.0.0
 
 # Security — generate these values, never use defaults
 JWT_SECRET=change_me_to_a_long_random_string
