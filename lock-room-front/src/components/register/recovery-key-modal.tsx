@@ -13,6 +13,16 @@ export const RecoveryKeyModal = ({ recoveryKey, onAcknowledged }: { recoveryKey:
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const download = () => {
+    const blob = new Blob([`LOCK-ROOM RECOVERY KEY\n\n${formatted}\n\nStore this file in a safe place. Do not share it with anyone.`], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'lock-room-recovery-key.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div
       style={{
@@ -96,6 +106,23 @@ export const RecoveryKeyModal = ({ recoveryKey, onAcknowledged }: { recoveryKey:
             onMouseLeave={(e) => { if (!copied) e.currentTarget.style.color = 'var(--text-muted)' }}
           >
             {copied ? '[ COPIED ]' : '[ COPY_KEY ]'}
+          </button>
+          <button
+            type="button"
+            onClick={download}
+            className="label-tag flex-1 transition-colors"
+            style={{
+              border: '1px solid var(--border-strong)',
+              background: 'none',
+              padding: '0.6rem',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              transition: 'color 200ms ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+          >
+            [ DOWNLOAD ]
           </button>
         </div>
 
