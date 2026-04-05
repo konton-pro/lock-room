@@ -13,6 +13,9 @@ const validateEmail = (value: string) =>
 const validatePassword = (value: string) =>
   value.length < 8 ? 'MIN_8_CHARS_REQUIRED' : undefined
 
+const validateConfirmPassword = (value: string, password: string) =>
+  value !== password ? 'PASSWORDS_DO_NOT_MATCH' : undefined
+
 export const useRegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
@@ -23,11 +26,14 @@ export const useRegisterForm = () => {
   })
 
   const form = useForm({
-    defaultValues: { name: '', email: '', password: '' },
-    onSubmit: ({ value }) => mutateAsync(value),
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+    onSubmit: ({ value }) => mutateAsync({ name: value.name, email: value.email, password: value.password }),
     validators: {
       onSubmit: ({ value }) =>
-        validateName(value.name) || validateEmail(value.email) || validatePassword(value.password)
+        validateName(value.name) ||
+        validateEmail(value.email) ||
+        validatePassword(value.password) ||
+        validateConfirmPassword(value.confirmPassword, value.password)
           ? 'VALIDATION_FAILED'
           : undefined,
     },
@@ -36,4 +42,4 @@ export const useRegisterForm = () => {
   return { form, showPassword, setShowPassword, isError, resetMutation }
 }
 
-export { validateName, validateEmail, validatePassword }
+export { validateName, validateEmail, validatePassword, validateConfirmPassword }

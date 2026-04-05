@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useRegisterForm, validateName, validateEmail, validatePassword } from '@/hooks/use-register-form'
+import { useRegisterForm, validateName, validateEmail, validatePassword, validateConfirmPassword } from '@/hooks/use-register-form'
 import { HexParityGrid } from '@/components/ui/hex-parity-grid'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
@@ -89,7 +89,7 @@ export const RegisterForm = () => {
         >
           <form.Field
             name="name"
-            validators={{ onBlur: ({ value }) => validateName(value) }}
+            validators={{ onSubmit: ({ value }) => validateName(value) }}
           >
             {(field) => (
               <div className="flex flex-col gap-2">
@@ -134,7 +134,7 @@ export const RegisterForm = () => {
                     />
                   </div>
                 </div>
-                {field.state.meta.isTouched && field.state.meta.errors[0] && (
+                {field.state.meta.errors[0] && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
                     [ERROR] {field.state.meta.errors[0]}
                   </p>
@@ -145,7 +145,7 @@ export const RegisterForm = () => {
 
           <form.Field
             name="email"
-            validators={{ onBlur: ({ value }) => validateEmail(value) }}
+            validators={{ onSubmit: ({ value }) => validateEmail(value) }}
           >
             {(field) => (
               <div className="flex flex-col gap-2">
@@ -189,7 +189,7 @@ export const RegisterForm = () => {
                     />
                   </div>
                 </div>
-                {field.state.meta.isTouched && field.state.meta.errors[0] && (
+                {field.state.meta.errors[0] && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
                     [ERROR] {field.state.meta.errors[0]}
                   </p>
@@ -200,7 +200,7 @@ export const RegisterForm = () => {
 
           <form.Field
             name="password"
-            validators={{ onBlur: ({ value }) => validatePassword(value) }}
+            validators={{ onSubmit: ({ value }) => validatePassword(value) }}
           >
             {(field) => (
               <div className="flex flex-col gap-2">
@@ -259,7 +259,65 @@ export const RegisterForm = () => {
                   <CheckRow ok={field.state.value.length >= 8} label="MIN_8_CHARS" />
                 </div>
 
-                {field.state.meta.isTouched && field.state.meta.errors[0] && (
+                {field.state.meta.errors[0] && (
+                  <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
+                    [ERROR] {field.state.meta.errors[0]}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="confirmPassword"
+            validators={{
+              onSubmit: ({ value, fieldApi }) =>
+                validateConfirmPassword(value, fieldApi.form.getFieldValue('password')),
+            }}
+          >
+            {(field) => (
+              <div className="flex flex-col gap-2">
+                <div
+                  className="relative"
+                  style={{
+                    border: `1px solid ${field.state.meta.errors.length ? '#ef4444' : 'var(--border-strong)'}`,
+                    background: 'var(--surface)',
+                    transition: 'border-color 200ms ease',
+                  }}
+                >
+                  <span
+                    className="absolute top-0 left-4 label-tag px-1"
+                    style={{
+                      transform: 'translateY(-50%)',
+                      background: 'var(--bg)',
+                      color: field.state.meta.errors.length ? '#ef4444' : 'var(--text-muted)',
+                      fontSize: '0.6rem',
+                      letterSpacing: '0.18em',
+                      transition: 'color 200ms ease',
+                    }}
+                  >
+                    CONFIRM_MASTER_HASH
+                  </span>
+                  <div className="flex items-center gap-2 px-4 py-4">
+                    <span className="flex-shrink-0 text-sm" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      {'>'}
+                    </span>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={field.state.value}
+                      onChange={(e) => {
+                        clearMutationError()
+                        field.handleChange(e.target.value)
+                      }}
+                      onBlur={field.handleBlur}
+                      placeholder="CONFIRM_PASSWORD"
+                      autoComplete="new-password"
+                      className="flex-1 bg-transparent outline-none text-sm tracking-widest"
+                      style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
+                    />
+                  </div>
+                </div>
+                {field.state.meta.errors[0] && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
                     [ERROR] {field.state.meta.errors[0]}
                   </p>
