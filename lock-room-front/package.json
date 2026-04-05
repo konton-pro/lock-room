@@ -30,6 +30,7 @@
     "@tanstack/react-start": "latest",
     "@tanstack/react-table": "latest",
     "@tanstack/router-plugin": "^1.132.0",
+    "@tanstack/zod-form-adapter": "^0.42.1",
     "hono": "^4.12.10",
     "ky": "^1.14.3",
     "lucide-react": "^0.545.0",

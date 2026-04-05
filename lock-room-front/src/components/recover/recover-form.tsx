@@ -88,10 +88,6 @@ export const RecoverForm = () => {
     resetReset,
     showPassword,
     setShowPassword,
-    validateEmail,
-    validateRecoveryKey,
-    validatePassword,
-    validateConfirmPassword,
   } = useRecoverForm()
 
   return (
@@ -144,10 +140,7 @@ export const RecoverForm = () => {
             className="flex flex-col gap-6 fade-up"
             style={{ animationDelay: '200ms' }}
           >
-            <verifyForm.Field
-              name="email"
-              validators={{ onSubmit: ({ value }) => validateEmail(value) }}
-            >
+            <verifyForm.Field name="email">
               {(field) => (
                 <TerminalField
                   label="INPUT_IDENTIFIER"
@@ -157,15 +150,12 @@ export const RecoverForm = () => {
                   type="email"
                   placeholder="user@domain.com"
                   autoFocus
-                  error={field.state.meta.errors[0] as string | undefined}
+                  error={field.state.meta.errors[0]?.message}
                 />
               )}
             </verifyForm.Field>
 
-            <verifyForm.Field
-              name="recoveryKey"
-              validators={{ onSubmit: ({ value }) => validateRecoveryKey(value) }}
-            >
+            <verifyForm.Field name="recoveryKey">
               {(field) => (
                 <TerminalField
                   label="INPUT_RECOVERY_KEY"
@@ -173,7 +163,7 @@ export const RecoverForm = () => {
                   onChange={(v) => { if (verifyError) resetVerify(); field.handleChange(v) }}
                   onBlur={field.handleBlur}
                   placeholder="xxxxxxxx-xxxxxxxx-..."
-                  error={field.state.meta.errors[0] as string | undefined}
+                  error={field.state.meta.errors[0]?.message}
                 />
               )}
             </verifyForm.Field>
@@ -224,10 +214,7 @@ export const RecoverForm = () => {
             className="flex flex-col gap-6 fade-up"
             style={{ animationDelay: '200ms' }}
           >
-            <resetForm.Field
-              name="newPassword"
-              validators={{ onSubmit: ({ value }) => validatePassword(value) }}
-            >
+            <resetForm.Field name="newPassword">
               {(field) => (
                 <TerminalField
                   label="INPUT_NEW_MASTER_HASH"
@@ -237,7 +224,7 @@ export const RecoverForm = () => {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="enter new password"
                   autoFocus
-                  error={field.state.meta.errors[0] as string | undefined}
+                  error={field.state.meta.errors[0]?.message}
                   suffix={
                     <button
                       type="button"
@@ -254,13 +241,7 @@ export const RecoverForm = () => {
               )}
             </resetForm.Field>
 
-            <resetForm.Field
-              name="confirmPassword"
-              validators={{
-                onSubmit: ({ value, fieldApi }) =>
-                  validateConfirmPassword(value, fieldApi.form.getFieldValue('newPassword')),
-              }}
-            >
+            <resetForm.Field name="confirmPassword">
               {(field) => (
                 <TerminalField
                   label="CONFIRM_NEW_MASTER_HASH"
@@ -269,7 +250,7 @@ export const RecoverForm = () => {
                   onBlur={field.handleBlur}
                   type={showPassword ? 'text' : 'password'}
                   placeholder="confirm new password"
-                  error={field.state.meta.errors[0] as string | undefined}
+                  error={field.state.meta.errors[0]?.message}
                   suffix={
                     <button
                       type="button"

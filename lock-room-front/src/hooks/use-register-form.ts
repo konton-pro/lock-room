@@ -1,24 +1,25 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { zodValidator } from '@tanstack/zod-form-adapter'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { z } from 'zod'
 import { authMutations } from '@/queries/auth'
 import { generateRandomKey, deriveKeyFromPassword } from '@/lib/crypto/keys'
 import { encrypt } from '@/lib/crypto/cipher'
 import { toBase64 } from '@/lib/crypto/encoding'
 import { generateRecoveryKey, hashRecoveryKey, encryptMasterKeyWithRecoveryKey } from '@/lib/crypto/recovery-crypto'
 
-const validateName = (value: string) =>
-  value.trim().length < 1 ? 'NAME_REQUIRED' : undefined
-
-const validateEmail = (value: string) =>
-  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'INVALID_EMAIL_FORMAT' : undefined
-
-const validatePassword = (value: string) =>
-  value.length < 8 ? 'MIN_8_CHARS_REQUIRED' : undefined
-
-const validateConfirmPassword = (value: string, password: string) =>
-  value !== password ? 'PASSWORDS_DO_NOT_MATCH' : undefined
+export const registerSchema = z.object({
+  name: z.string().min(1, 'NAME_REQUIRED'),
+  email: z.string().email('INVALID_EMAIL_FORMAT'),
+  password: z.string().min(8, 'MIN_8_CHARS_REQUIRED'),
+  confirmPassword: z.string(),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirmPassword) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'PASSWORDS_DO_NOT_MATCH', path: ['confirmPassword'] })
+  }
+})
 
 const buildRegistrationPayload = async (password: string) => {
   const masterKey = generateRandomKey()
@@ -60,6 +61,8 @@ export const useRegisterForm = () => {
   const { mutateAsync, isError, reset: resetMutation } = useMutation(authMutations.register())
 
   const form = useForm({
+    validatorAdapter: zodValidator(),
+    validators: { onSubmit: registerSchema },
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
     onSubmit: async ({ value }) => {
       const { recoveryKey: key, masterKeyPayload, recoveryPayload } = await buildRegistrationPayload(value.password)
@@ -72,20 +75,9 @@ export const useRegisterForm = () => {
       })
       setRecoveryKey(key)
     },
-    validators: {
-      onSubmit: ({ value }) =>
-        validateName(value.name) ||
-        validateEmail(value.email) ||
-        validatePassword(value.password) ||
-        validateConfirmPassword(value.confirmPassword, value.password)
-          ? 'VALIDATION_FAILED'
-          : undefined,
-    },
   })
 
   const onRecoveryAcknowledged = () => navigate({ to: '/login' })
 
   return { form, showPassword, setShowPassword, isError, resetMutation, recoveryKey, onRecoveryAcknowledged }
 }
-
-export { validateName, validateEmail, validatePassword, validateConfirmPassword }

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useRegisterForm, validateName, validateEmail, validatePassword, validateConfirmPassword } from '@/hooks/use-register-form'
+import { useRegisterForm } from '@/hooks/use-register-form'
 import { HexParityGrid } from '@/components/ui/hex-parity-grid'
 import { ScrambleText } from '@/components/ui/scramble-text'
 import { RecoveryKeyModal } from '@/components/register/recovery-key-modal'
@@ -89,10 +89,7 @@ export const RegisterForm = () => {
           className="flex flex-col gap-6 fade-up"
           style={{ animationDelay: '200ms' }}
         >
-          <form.Field
-            name="name"
-            validators={{ onSubmit: ({ value }) => validateName(value) }}
-          >
+          <form.Field name="name">
             {(field) => (
               <div className="flex flex-col gap-2">
                 <div
@@ -136,19 +133,16 @@ export const RegisterForm = () => {
                     />
                   </div>
                 </div>
-                {field.state.meta.errors[0] && (
+                {field.state.meta.errors[0]?.message && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
-                    [ERROR] {field.state.meta.errors[0]}
+                    [ERROR] {field.state.meta.errors[0]?.message}
                   </p>
                 )}
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="email"
-            validators={{ onSubmit: ({ value }) => validateEmail(value) }}
-          >
+          <form.Field name="email">
             {(field) => (
               <div className="flex flex-col gap-2">
                 <div
@@ -191,19 +185,16 @@ export const RegisterForm = () => {
                     />
                   </div>
                 </div>
-                {field.state.meta.errors[0] && (
+                {field.state.meta.errors[0]?.message && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
-                    [ERROR] {field.state.meta.errors[0]}
+                    [ERROR] {field.state.meta.errors[0]?.message}
                   </p>
                 )}
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="password"
-            validators={{ onSubmit: ({ value }) => validatePassword(value) }}
-          >
+          <form.Field name="password">
             {(field) => (
               <div className="flex flex-col gap-2">
                 <div
@@ -261,22 +252,16 @@ export const RegisterForm = () => {
                   <CheckRow ok={field.state.value.length >= 8} label="MIN_8_CHARS" />
                 </div>
 
-                {field.state.meta.errors[0] && (
+                {field.state.meta.errors[0]?.message && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
-                    [ERROR] {field.state.meta.errors[0]}
+                    [ERROR] {field.state.meta.errors[0]?.message}
                   </p>
                 )}
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="confirmPassword"
-            validators={{
-              onSubmit: ({ value, fieldApi }) =>
-                validateConfirmPassword(value, fieldApi.form.getFieldValue('password')),
-            }}
-          >
+          <form.Field name="confirmPassword">
             {(field) => (
               <div className="flex flex-col gap-2">
                 <div
@@ -329,9 +314,9 @@ export const RegisterForm = () => {
                     </button>
                   </div>
                 </div>
-                {field.state.meta.errors[0] && (
+                {field.state.meta.errors[0]?.message && (
                   <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
-                    [ERROR] {field.state.meta.errors[0]}
+                    [ERROR] {field.state.meta.errors[0]?.message}
                   </p>
                 )}
               </div>

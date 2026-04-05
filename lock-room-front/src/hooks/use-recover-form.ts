@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { zodValidator } from '@tanstack/zod-form-adapter'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { z } from 'zod'
 import { recoveryMutations } from '@/queries/recovery'
 import { deriveKeyFromPassword } from '@/lib/crypto/keys'
 import { encrypt } from '@/lib/crypto/cipher'
@@ -15,17 +17,22 @@ import {
 
 type Step = 'verify' | 'reset'
 
-const validateEmail = (value: string) =>
-  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'INVALID_EMAIL_FORMAT' : undefined
+const verifySchema = z.object({
+  email: z.string().email('INVALID_EMAIL_FORMAT'),
+  recoveryKey: z.string().refine(
+    (v) => normalizeRecoveryKey(v).length === 64,
+    'INVALID_RECOVERY_KEY_FORMAT',
+  ),
+})
 
-const validateRecoveryKey = (value: string) =>
-  normalizeRecoveryKey(value).length !== 64 ? 'INVALID_RECOVERY_KEY_FORMAT' : undefined
-
-const validatePassword = (value: string) =>
-  value.length < 8 ? 'MIN_8_CHARS_REQUIRED' : undefined
-
-const validateConfirmPassword = (value: string, password: string) =>
-  value !== password ? 'PASSWORDS_DO_NOT_MATCH' : undefined
+const resetSchema = z.object({
+  newPassword: z.string().min(8, 'MIN_8_CHARS_REQUIRED'),
+  confirmPassword: z.string(),
+}).superRefine((data, ctx) => {
+  if (data.newPassword !== data.confirmPassword) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'PASSWORDS_DO_NOT_MATCH', path: ['confirmPassword'] })
+  }
+})
 
 export const useRecoverForm = () => {
   const [step, setStep] = useState<Step>('verify')
@@ -39,6 +46,8 @@ export const useRecoverForm = () => {
   const { mutateAsync: resetAccount, isError: resetError, reset: resetReset } = useMutation(recoveryMutations.reset())
 
   const verifyForm = useForm({
+    validatorAdapter: zodValidator(),
+    validators: { onSubmit: verifySchema },
     defaultValues: { email: '', recoveryKey: '' },
     onSubmit: async ({ value }) => {
       const normalized = normalizeRecoveryKey(value.recoveryKey)
@@ -55,15 +64,11 @@ export const useRecoverForm = () => {
       setMasterKey(decrypted)
       setStep('reset')
     },
-    validators: {
-      onSubmit: ({ value }) =>
-        validateEmail(value.email) || validateRecoveryKey(value.recoveryKey)
-          ? 'VALIDATION_FAILED'
-          : undefined,
-    },
   })
 
   const resetForm = useForm({
+    validatorAdapter: zodValidator(),
+    validators: { onSubmit: resetSchema },
     defaultValues: { newPassword: '', confirmPassword: '' },
     onSubmit: async ({ value }) => {
       if (!masterKey) return
@@ -95,28 +100,7 @@ export const useRecoverForm = () => {
 
       navigate({ to: '/login' })
     },
-    validators: {
-      onSubmit: ({ value }) =>
-        validatePassword(value.newPassword) ||
-        validateConfirmPassword(value.confirmPassword, value.newPassword)
-          ? 'VALIDATION_FAILED'
-          : undefined,
-    },
   })
 
-  return {
-    step,
-    verifyForm,
-    resetForm,
-    verifyError,
-    resetError,
-    resetVerify,
-    resetReset,
-    showPassword,
-    setShowPassword,
-    validateEmail,
-    validateRecoveryKey,
-    validatePassword,
-    validateConfirmPassword,
-  }
+  return { step, verifyForm, resetForm, verifyError, resetError, resetVerify, resetReset, showPassword, setShowPassword }
 }

@@ -1,15 +1,21 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { zodValidator } from '@tanstack/zod-form-adapter'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { z } from 'zod'
 import { authMutations } from '@/queries/auth'
 import { authStore } from '@/stores/auth-store'
 import { vaultKeyStore } from '@/stores/vault-key-store'
 import { deriveKeyFromPassword } from '@/lib/crypto/keys'
 import { decrypt } from '@/lib/crypto/cipher'
 import { fromBase64 } from '@/lib/crypto/encoding'
-import { validateEmail, validatePassword } from '@/hooks/use-register-form'
 import type { LoginResponse } from '@/types/auth'
+
+const loginSchema = z.object({
+  email: z.string().email('INVALID_EMAIL_FORMAT'),
+  password: z.string().min(8, 'MIN_8_CHARS_REQUIRED'),
+})
 
 const decryptMasterKey = async (data: LoginResponse, password: string): Promise<string> => {
   const saltBytes = fromBase64(data.masterKeySalt)
@@ -30,6 +36,8 @@ export const useLoginForm = () => {
   const { mutateAsync, isError, reset: resetMutation } = useMutation(authMutations.login())
 
   const form = useForm({
+    validatorAdapter: zodValidator(),
+    validators: { onSubmit: loginSchema },
     defaultValues: { email: '', password: '' },
     onSubmit: async ({ value }) => {
       const data = await mutateAsync({
@@ -42,15 +50,7 @@ export const useLoginForm = () => {
       vaultKeyStore.setKey(masterKey)
       navigate({ to: '/dashboard' })
     },
-    validators: {
-      onSubmit: ({ value }) =>
-        validateEmail(value.email) || validatePassword(value.password)
-          ? 'VALIDATION_FAILED'
-          : undefined,
-    },
   })
 
   return { form, showPassword, setShowPassword, isError, resetMutation }
 }
-
-export { validateEmail, validatePassword }

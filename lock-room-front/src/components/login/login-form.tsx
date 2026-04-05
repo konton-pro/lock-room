@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useLoginForm, validateEmail, validatePassword } from '@/hooks/use-login-form'
+import { useLoginForm } from '@/hooks/use-login-form'
 import { HexParityGrid } from '@/components/ui/hex-parity-grid'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
@@ -140,10 +140,7 @@ export const LoginForm = () => {
           className="flex flex-col gap-6 fade-up"
           style={{ animationDelay: '200ms' }}
         >
-          <form.Field
-            name="email"
-            validators={{ onSubmit: ({ value }) => validateEmail(value) }}
-          >
+          <form.Field name="email">
             {(field) => (
               <TerminalField
                 label="INPUT_IDENTIFIER"
@@ -155,15 +152,12 @@ export const LoginForm = () => {
                 type="email"
                 placeholder="user@domain.com"
                 autoFocus
-                error={field.state.meta.errors[0] as string | undefined}
+                error={field.state.meta.errors[0]?.message}
               />
             )}
           </form.Field>
 
-          <form.Field
-            name="password"
-            validators={{ onSubmit: ({ value }) => validatePassword(value) }}
-          >
+          <form.Field name="password">
             {(field) => (
               <TerminalField
                 label="INPUT_MASTER_HASH"
@@ -174,7 +168,7 @@ export const LoginForm = () => {
                 }}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="enter password"
-                error={field.state.meta.errors[0] as string | undefined}
+                error={field.state.meta.errors[0]?.message}
                 suffix={
                   <button
                     type="button"
