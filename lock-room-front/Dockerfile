@@ -17,10 +17,10 @@ ENV VITE_APP_TITLE=${VITE_APP_TITLE}
 RUN pnpm run build
 
 FROM base AS production
-COPY --from=build /app/dist ./.output
+COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./package.json
 
 ENV PORT=3000
 EXPOSE ${PORT}
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "dist/server/server.js"]
