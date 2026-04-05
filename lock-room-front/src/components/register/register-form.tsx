@@ -315,6 +315,16 @@ export const RegisterForm = () => {
                       className="flex-1 bg-transparent outline-none text-sm tracking-widest"
                       style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="flex-shrink-0 label-tag transition-colors"
+                      style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                    >
+                      {showPassword ? '[HIDE]' : '[SHOW]'}
+                    </button>
                   </div>
                 </div>
                 {field.state.meta.errors[0] && (

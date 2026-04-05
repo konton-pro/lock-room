@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { vaultQueries } from '@/queries/vault'
 import { DashboardSidebar } from './dashboard-sidebar'
 import { VaultCard } from './vault-card'
+import { NewEntryModal } from './new-entry-modal'
 
 const SESSION_TS = new Date().toISOString().replace('T', 'T').split('.')[0] + 'Z'
 
@@ -63,10 +65,12 @@ const TopBar = () => (
 
 export const DashboardPage = () => {
   const { data: items = [], isLoading } = useQuery(vaultQueries.list())
+  const [isNewEntryOpen, setIsNewEntryOpen] = useState(false)
 
   return (
     <div className="flex" style={{ minHeight: '100vh' }}>
-      <DashboardSidebar />
+      {isNewEntryOpen && <NewEntryModal onClose={() => setIsNewEntryOpen(false)} />}
+      <DashboardSidebar onNewEntry={() => setIsNewEntryOpen(true)} />
 
       <div className="flex flex-col flex-1" style={{ overflow: 'hidden' }}>
         <TopBar />

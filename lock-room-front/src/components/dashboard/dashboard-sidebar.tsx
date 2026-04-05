@@ -1,14 +1,9 @@
-import { Terminal, KeyRound, Archive, ScrollText, Settings } from 'lucide-react'
+import { Terminal, Settings } from 'lucide-react'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
-const NAV_ITEMS = [
-  { label: 'TERMINAL', Icon: Terminal, active: true },
-  { label: 'KEYS', Icon: KeyRound, active: false },
-  { label: 'ARCHIVE', Icon: Archive, active: false },
-  { label: 'LOGS', Icon: ScrollText, active: false },
-] as const
+const NAV_ITEMS = [{ label: 'TERMINAL', Icon: Terminal, active: true }] as const
 
-export const DashboardSidebar = () => (
+export const DashboardSidebar = ({ onNewEntry }: { onNewEntry: () => void }) => (
   <aside
     style={{
       width: '220px',
@@ -85,7 +80,12 @@ export const DashboardSidebar = () => (
     <div style={{ flex: 1 }} />
 
     <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)' }}>
-      <button className="btn-primary text-xs" style={{ width: '100%', justifyContent: 'center' }}>
+      <button
+        type="button"
+        className="btn-primary text-xs"
+        style={{ width: '100%', justifyContent: 'center' }}
+        onClick={onNewEntry}
+      >
         [ <ScrambleText>NEW_ENTRY</ScrambleText> ]
       </button>
     </div>
