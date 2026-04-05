@@ -17,6 +17,7 @@ ENV VITE_APP_TITLE=${VITE_APP_TITLE}
 RUN pnpm run build
 
 FROM base AS production
+COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./package.json
 
