@@ -20,8 +20,9 @@ FROM base AS production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./package.json
+COPY node-server.mjs ./node-server.mjs
 
 ENV PORT=3000
 EXPOSE ${PORT}
 
-CMD ["node", "dist/server/server.js"]
+CMD ["node", "node-server.mjs"]

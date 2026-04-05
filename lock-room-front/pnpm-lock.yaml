@@ -11,6 +11,9 @@ importers:
       '@faker-js/faker':
         specifier: ^10.3.0
         version: 10.4.0
+      '@hono/node-server':
+        specifier: ^1.19.12
+        version: 1.19.12(hono@4.12.10)
       '@t3-oss/env-core':
         specifier: ^0.13.10
         version: 0.13.11(typescript@5.9.3)(zod@4.3.6)
@@ -489,6 +492,12 @@ packages:
   '@faker-js/faker@10.4.0':
     resolution: {integrity: sha512-sDBWI3yLy8EcDzgobvJTWq1MJYzAkQdpjXuPukga9wXonhpMRvd1Izuo2Qgwey2OiEoRIBr35RMU9HJRoOHzpw==}
     engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
+
+  '@hono/node-server@1.19.12':
+    resolution: {integrity: sha512-txsUW4SQ1iilgE0l9/e9VQWmELXifEFvmdA1j6WFh/aFPj99hIntrSsq/if0UWyGVkmrRPKA1wCeP+UCr1B9Uw==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1778,6 +1787,10 @@ packages:
       crossws:
         optional: true
 
+  hono@4.12.10:
+    resolution: {integrity: sha512-mx/p18PLy5og9ufies2GOSUqep98Td9q4i/EF6X7yJgAiIopxqdfIO3jbqsi3jRgTgw88jMDEzVKi+V2EF+27w==}
+    engines: {node: '>=16.9.0'}
+
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
@@ -2835,6 +2848,10 @@ snapshots:
   '@exodus/bytes@1.15.0': {}
 
   '@faker-js/faker@10.4.0': {}
+
+  '@hono/node-server@1.19.12(hono@4.12.10)':
+    dependencies:
+      hono: 4.12.10
 
   '@humanfs/core@0.19.1': {}
 
@@ -4172,6 +4189,8 @@ snapshots:
     dependencies:
       rou3: 0.8.1
       srvx: 0.11.13
+
+  hono@4.12.10: {}
 
   html-encoding-sniffer@6.0.0:
     dependencies:
