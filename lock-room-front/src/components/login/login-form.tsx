@@ -234,6 +234,15 @@ export const LoginForm = () => {
               [ CREATE_VAULT ]
             </Link>
             <Link
+              to="/recover"
+              className="label-tag transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            >
+              [ RECOVER_VAULT ]
+            </Link>
+            <Link
               to="/"
               className="label-tag transition-colors"
               style={{ color: 'var(--text-muted)' }}
