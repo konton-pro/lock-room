@@ -27,17 +27,16 @@
     /* Modules */
     "module": "ES2022",                                /* Specify what module code is generated. */
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
-    "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    "moduleResolution": "bundler",                    /* Specify how TypeScript looks up a file from a given module specifier. */
     "paths": {
-      "@/*": ["src/*"],
-      "@database/*": ["src/database/*"],
-      "@schema/*": ["src/database/schema/*"],
-      "@exceptions/*": ["src/exceptions/*"],
-      "@configs/*": ["src/configs/*"],
-      "@plugins/*": ["src/plugins/*"],
-      "@modules/*": ["src/modules/*"],
-      "@tests/*": ["src/tests/*"]
+      "@/*": ["./src/*"],
+      "@database/*": ["./src/database/*"],
+      "@schema/*": ["./src/database/schema/*"],
+      "@exceptions/*": ["./src/exceptions/*"],
+      "@configs/*": ["./src/configs/*"],
+      "@plugins/*": ["./src/plugins/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@tests/*": ["./src/tests/*"]
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
