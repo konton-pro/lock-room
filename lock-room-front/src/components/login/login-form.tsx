@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useLoginForm } from '@/hooks/use-login-form'
+import { useLoginForm, validateEmail, validatePassword } from '@/hooks/use-login-form'
 import { HexParityGrid } from '@/components/ui/hex-parity-grid'
 import { ScrambleText } from '@/components/ui/scramble-text'
 
@@ -17,6 +17,7 @@ const TerminalField = ({
   placeholder,
   autoFocus,
   suffix,
+  error,
 }: {
   label: string
   value: string
@@ -25,48 +26,61 @@ const TerminalField = ({
   placeholder: string
   autoFocus?: boolean
   suffix?: React.ReactNode
+  error?: string
 }) => (
-  <div
-    className="relative"
-    style={{ border: '1px solid var(--border-strong)', background: 'var(--surface)' }}
-  >
-    <span
-      className="absolute top-0 left-4 label-tag px-1"
+  <div className="flex flex-col gap-2">
+    <div
+      className="relative"
       style={{
-        transform: 'translateY(-50%)',
-        background: 'var(--bg)',
-        color: 'var(--text-muted)',
-        fontSize: '0.6rem',
-        letterSpacing: '0.18em',
+        border: `1px solid ${error ? '#ef4444' : 'var(--border-strong)'}`,
+        background: 'var(--surface)',
+        transition: 'border-color 200ms ease',
       }}
     >
-      {label}
-    </span>
-    <div className="flex items-center gap-2 px-4 py-4">
       <span
-        className="flex-shrink-0 text-sm"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}
-      >
-        {'>'}
-      </span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        autoFocus={autoFocus}
-        autoComplete={type === 'password' ? 'current-password' : 'email'}
-        className="flex-1 bg-transparent outline-none text-sm tracking-widest"
+        className="absolute top-0 left-4 label-tag px-1"
         style={{
-          fontFamily: 'var(--font-mono)',
-          color: '#4ade80',
-          border: 'none',
-          caretColor: '#4ade80',
-          textTransform: type === 'password' ? 'none' : 'uppercase',
+          transform: 'translateY(-50%)',
+          background: 'var(--bg)',
+          color: error ? '#ef4444' : 'var(--text-muted)',
+          fontSize: '0.6rem',
+          letterSpacing: '0.18em',
+          transition: 'color 200ms ease',
         }}
-      />
-      {suffix}
+      >
+        {label}
+      </span>
+      <div className="flex items-center gap-2 px-4 py-4">
+        <span
+          className="flex-shrink-0 text-sm"
+          style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}
+        >
+          {'>'}
+        </span>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoFocus={autoFocus}
+          autoComplete={type === 'password' ? 'current-password' : 'email'}
+          className="flex-1 bg-transparent outline-none text-sm tracking-widest"
+          style={{
+            fontFamily: 'var(--font-mono)',
+            color: '#4ade80',
+            border: 'none',
+            caretColor: '#4ade80',
+            textTransform: type === 'password' ? 'none' : 'uppercase',
+          }}
+        />
+        {suffix}
+      </div>
     </div>
+    {error && (
+      <p className="label-tag m-0 px-1" style={{ color: '#ef4444' }}>
+        [ERROR] {error}
+      </p>
+    )}
   </div>
 )
 
@@ -127,7 +141,10 @@ export const LoginForm = () => {
           className="flex flex-col gap-6 fade-up"
           style={{ animationDelay: '200ms' }}
         >
-          <form.Field name="email">
+          <form.Field
+            name="email"
+            validators={{ onSubmit: ({ value }) => validateEmail(value) }}
+          >
             {(field) => (
               <TerminalField
                 label="INPUT_IDENTIFIER"
@@ -139,11 +156,15 @@ export const LoginForm = () => {
                 type="email"
                 placeholder="USER@DOMAIN.COM"
                 autoFocus
+                error={field.state.meta.errors[0] as string | undefined}
               />
             )}
           </form.Field>
 
-          <form.Field name="password">
+          <form.Field
+            name="password"
+            validators={{ onSubmit: ({ value }) => validatePassword(value) }}
+          >
             {(field) => (
               <TerminalField
                 label="INPUT_MASTER_HASH"
@@ -154,6 +175,7 @@ export const LoginForm = () => {
                 }}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="ENTER_PASSWORD"
+                error={field.state.meta.errors[0] as string | undefined}
                 suffix={
                   <button
                     type="button"
