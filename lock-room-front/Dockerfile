@@ -14,7 +14,7 @@ ARG VITE_API_URL
 ARG VITE_APP_TITLE="Lock Room"
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_APP_TITLE=${VITE_APP_TITLE}
-RUN pnpm run build
+RUN pnpm run build && ls -la /app/.output || (echo "BUILD FAILED - listing /app contents:" && ls -la /app && exit 1)
 
 FROM base AS production
 COPY --from=build /app/.output ./.output
