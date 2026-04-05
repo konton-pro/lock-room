@@ -150,7 +150,7 @@ export const LoginForm = () => {
                 value={field.state.value}
                 onChange={(v) => {
                   if (isError) resetMutation()
-                  field.handleChange(v.toLowerCase())
+                  field.handleChange(v)
                 }}
                 type="email"
                 placeholder="user@domain.com"
@@ -173,7 +173,7 @@ export const LoginForm = () => {
                   field.handleChange(v)
                 }}
                 type={showPassword ? 'text' : 'password'}
-                placeholder="ENTER_PASSWORD"
+                placeholder="enter password"
                 error={field.state.meta.errors[0] as string | undefined}
                 suffix={
                   <button

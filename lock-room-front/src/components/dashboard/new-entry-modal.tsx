@@ -190,7 +190,7 @@ export const NewEntryModal = ({ onClose }: { onClose: () => void }) => {
               setHeader(v)
               setFieldErrors((prev) => ({ ...prev, header: '' }))
             }}
-            placeholder="LABEL_YOUR_ENTRY"
+            placeholder="label your entry"
             error={fieldErrors.header}
           />
 
@@ -201,7 +201,7 @@ export const NewEntryModal = ({ onClose }: { onClose: () => void }) => {
               setBody(v)
               setFieldErrors((prev) => ({ ...prev, body: '' }))
             }}
-            placeholder="SECRET_CONTENT"
+            placeholder="secret content"
             multiline
             error={fieldErrors.body}
           />
@@ -266,7 +266,7 @@ export const NewEntryModal = ({ onClose }: { onClose: () => void }) => {
                 type="text"
                 value={keyHex}
                 onChange={(e) => setKeyHex(e.target.value.toLowerCase())}
-                placeholder="64_HEX_CHARS_OR_LEAVE_EMPTY"
+                placeholder="64 hex chars or leave empty"
                 className="flex-1 bg-transparent outline-none"
                 style={{
                   fontFamily: 'var(--font-mono)',

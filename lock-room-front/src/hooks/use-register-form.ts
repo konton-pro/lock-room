@@ -27,7 +27,7 @@ export const useRegisterForm = () => {
 
   const form = useForm({
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
-    onSubmit: ({ value }) => mutateAsync({ name: value.name, email: value.email, password: value.password }),
+    onSubmit: ({ value }) => mutateAsync({ name: value.name, email: value.email.toLowerCase(), password: value.password }),
     validators: {
       onSubmit: ({ value }) =>
         validateName(value.name) ||

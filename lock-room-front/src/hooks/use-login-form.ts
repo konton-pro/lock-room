@@ -20,7 +20,7 @@ export const useLoginForm = () => {
 
   const form = useForm({
     defaultValues: { email: '', password: '' },
-    onSubmit: ({ value }) => mutateAsync(value),
+    onSubmit: ({ value }) => mutateAsync({ ...value, email: value.email.toLowerCase() }),
     validators: {
       onSubmit: ({ value }) =>
         validateEmail(value.email) || validatePassword(value.password)

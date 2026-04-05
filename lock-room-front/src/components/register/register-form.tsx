@@ -126,7 +126,7 @@ export const RegisterForm = () => {
                         field.handleChange(e.target.value)
                       }}
                       onBlur={field.handleBlur}
-                      placeholder="YOUR_NAME"
+                      placeholder="your name"
                       autoComplete="name"
                       autoFocus
                       className="flex-1 bg-transparent outline-none text-sm tracking-widest"
@@ -179,7 +179,7 @@ export const RegisterForm = () => {
                       value={field.state.value}
                       onChange={(e) => {
                         clearMutationError()
-                        field.handleChange(e.target.value.toLowerCase())
+                        field.handleChange(e.target.value)
                       }}
                       onBlur={field.handleBlur}
                       placeholder="user@domain.com"
@@ -237,7 +237,7 @@ export const RegisterForm = () => {
                         field.handleChange(e.target.value)
                       }}
                       onBlur={field.handleBlur}
-                      placeholder="ENTER_PASSWORD"
+                      placeholder="enter password"
                       autoComplete="new-password"
                       className="flex-1 bg-transparent outline-none text-sm tracking-widest"
                       style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
@@ -310,7 +310,7 @@ export const RegisterForm = () => {
                         field.handleChange(e.target.value)
                       }}
                       onBlur={field.handleBlur}
-                      placeholder="CONFIRM_PASSWORD"
+                      placeholder="confirm password"
                       autoComplete="new-password"
                       className="flex-1 bg-transparent outline-none text-sm tracking-widest"
                       style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
