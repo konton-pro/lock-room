@@ -1,52 +1,42 @@
-import { useState, useEffect } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { getVaultItem } from '@/services/vault'
 import { vaultKeyStore } from '@/stores/vault-key-store'
 import { decryptVaultField } from '@/lib/crypto/vault-crypto'
 import type { VaultListItem } from '@/services/vault'
 
+const DECRYPT_FAILED = '[DECRYPT_FAILED]'
+
 export const useVaultCard = (item: VaultListItem) => {
-  const [title, setTitle] = useState<string | null>(null)
-  const [body, setBody] = useState<string | null>(null)
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  useEffect(() => {
-    const masterKey = vaultKeyStore.getKey()
-    if (!masterKey) {
-      setTitle('[DECRYPT_FAILED]')
-      return
-    }
-    decryptVaultField(item.encryptedHeader, item.clientIv, masterKey)
-      .then(setTitle)
-      .catch(() => setTitle('[DECRYPT_FAILED]'))
-  }, [item.encryptedHeader, item.clientIv])
-
-  const { mutate: fetchBody, isPending: loadingBody } = useMutation({
-    mutationFn: async () => {
+  const { data: title = null } = useQuery({
+    queryKey: ['vault', 'title', item.cuid],
+    queryFn: () => {
       const masterKey = vaultKeyStore.getKey()
-      if (!masterKey) throw new Error('NO_MASTER_KEY')
+      if (!masterKey) return DECRYPT_FAILED
+      return decryptVaultField(item.encryptedHeader, item.clientIv, masterKey)
+        .catch(() => DECRYPT_FAILED)
+    },
+    retry: false,
+  })
+
+  const { data: body = null, isPending: loadingBody } = useQuery({
+    queryKey: ['vault', 'body', item.cuid],
+    queryFn: async () => {
+      const masterKey = vaultKeyStore.getKey()
+      if (!masterKey) return DECRYPT_FAILED
       const full = await getVaultItem(item.cuid)
       return decryptVaultField(full.encryptedBody, full.clientIv, masterKey)
-    },
-    onSuccess: (decrypted) => {
-      setBody(decrypted)
-      setRevealed(true)
-    },
-    onError: () => {
-      setBody('[DECRYPT_FAILED]')
-      setRevealed(true)
+        .catch(() => DECRYPT_FAILED)
     },
   })
 
-  const reveal = () => {
-    if (revealed) { setRevealed(false); return }
-    if (body !== null) { setRevealed(true); return }
-    fetchBody()
-  }
+  const reveal = () => setRevealed((prev) => !prev)
 
   const copy = () => {
-    if (!body) return
+    if (!body || body === DECRYPT_FAILED) return
     navigator.clipboard.writeText(body)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
