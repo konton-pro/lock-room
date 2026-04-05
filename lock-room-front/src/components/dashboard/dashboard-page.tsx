@@ -6,8 +6,6 @@ import { DashboardSidebar } from './dashboard-sidebar'
 import { VaultCard } from './vault-card'
 import { NewEntryModal } from './new-entry-modal'
 
-const SESSION_TS = new Date().toISOString().replace('T', 'T').split('.')[0] + 'Z'
-
 const TopBar = () => (
   <div
     className="flex items-center justify-between"
