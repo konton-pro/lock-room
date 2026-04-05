@@ -14,11 +14,11 @@ export const app = new Elysia()
   .use(rateLimitPlugin)
   .use(xssPlugin)
   .use(loggerPlugin)
-  .use(swaggerPlugin)
+  .use(serverConfig.isProduction ? new Elysia() : swaggerPlugin)
   .use(modulesRoutes);
 
 if (import.meta.main) {
-  app.listen({ port: serverConfig.port, hostname: "0.0.0.0" });
+  app.listen({ port: serverConfig.port, hostname: serverConfig.hostname });
   console.log(
     `Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
   );
