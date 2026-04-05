@@ -19,6 +19,10 @@ export type RegisterPayload = {
   masterKeyIv: string
   masterKeyTag: string
   masterKeySalt: string
+  recoveryEncryptedPayload: string
+  recoveryIv: string
+  recoveryTag: string
+  recoveryKeyHash: string
 }
 
 export type RegisterResponse = {

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { useRegisterForm, validateName, validateEmail, validatePassword, validateConfirmPassword } from '@/hooks/use-register-form'
 import { HexParityGrid } from '@/components/ui/hex-parity-grid'
 import { ScrambleText } from '@/components/ui/scramble-text'
+import { RecoveryKeyModal } from '@/components/register/recovery-key-modal'
 
 const STATUS_INDICATORS = [
   { label: 'SYS_STABILITY', value: '100%' },
@@ -28,7 +29,7 @@ const CheckRow = ({ ok, label }: { ok: boolean; label: string }) => (
 )
 
 export const RegisterForm = () => {
-  const { form, showPassword, setShowPassword, isError, resetMutation } = useRegisterForm()
+  const { form, showPassword, setShowPassword, isError, resetMutation, recoveryKey, onRecoveryAcknowledged } = useRegisterForm()
 
   const clearMutationError = () => {
     if (isError) resetMutation()
@@ -39,6 +40,7 @@ export const RegisterForm = () => {
       className="page-wrap w-full flex flex-col min-h-[calc(100vh-57px)]"
       style={{ paddingTop: '4rem', paddingBottom: '3rem' }}
     >
+      {recoveryKey && <RecoveryKeyModal recoveryKey={recoveryKey} onAcknowledged={onRecoveryAcknowledged} />}
       <div className="flex flex-col gap-1 fade-in">
         {STATUS_INDICATORS.map(({ label, value }) => (
           <p

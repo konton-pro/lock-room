@@ -6,6 +6,7 @@ import { authMutations } from '@/queries/auth'
 import { generateRandomKey, deriveKeyFromPassword } from '@/lib/crypto/keys'
 import { encrypt } from '@/lib/crypto/cipher'
 import { toBase64 } from '@/lib/crypto/encoding'
+import { generateRecoveryKey, hashRecoveryKey, encryptMasterKeyWithRecoveryKey } from '@/lib/crypto/recovery-crypto'
 
 const validateName = (value: string) =>
   value.trim().length < 1 ? 'NAME_REQUIRED' : undefined
@@ -19,7 +20,7 @@ const validatePassword = (value: string) =>
 const validateConfirmPassword = (value: string, password: string) =>
   value !== password ? 'PASSWORDS_DO_NOT_MATCH' : undefined
 
-const buildMasterKeyPayload = async (password: string) => {
+const buildRegistrationPayload = async (password: string) => {
   const masterKey = generateRandomKey()
   const saltBytes = crypto.getRandomValues(new Uint8Array(16))
   const wrapKey = await deriveKeyFromPassword(password, saltBytes.buffer as ArrayBuffer)
@@ -27,16 +28,33 @@ const buildMasterKeyPayload = async (password: string) => {
     new TextEncoder().encode(masterKey).buffer as ArrayBuffer,
     wrapKey,
   )
+
+  const recoveryKey = generateRecoveryKey()
+  const [recoveryKeyHash, recoveryPayload] = await Promise.all([
+    hashRecoveryKey(recoveryKey),
+    encryptMasterKeyWithRecoveryKey(masterKey, recoveryKey),
+  ])
+
   return {
-    encryptedMasterKey: encrypted,
-    masterKeyIv: iv,
-    masterKeyTag: tag,
-    masterKeySalt: toBase64(saltBytes.buffer as ArrayBuffer),
+    recoveryKey,
+    masterKeyPayload: {
+      encryptedMasterKey: encrypted,
+      masterKeyIv: iv,
+      masterKeyTag: tag,
+      masterKeySalt: toBase64(saltBytes.buffer as ArrayBuffer),
+    },
+    recoveryPayload: {
+      recoveryEncryptedPayload: recoveryPayload.encrypted,
+      recoveryIv: recoveryPayload.iv,
+      recoveryTag: recoveryPayload.tag,
+      recoveryKeyHash,
+    },
   }
 }
 
 export const useRegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [recoveryKey, setRecoveryKey] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const { mutateAsync, isError, reset: resetMutation } = useMutation(authMutations.register())
@@ -44,14 +62,15 @@ export const useRegisterForm = () => {
   const form = useForm({
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
     onSubmit: async ({ value }) => {
-      const masterKeyPayload = await buildMasterKeyPayload(value.password)
+      const { recoveryKey: key, masterKeyPayload, recoveryPayload } = await buildRegistrationPayload(value.password)
       await mutateAsync({
         name: value.name,
         email: value.email.toLowerCase(),
         password: value.password,
         ...masterKeyPayload,
+        ...recoveryPayload,
       })
-      navigate({ to: '/login' })
+      setRecoveryKey(key)
     },
     validators: {
       onSubmit: ({ value }) =>
@@ -64,7 +83,9 @@ export const useRegisterForm = () => {
     },
   })
 
-  return { form, showPassword, setShowPassword, isError, resetMutation }
+  const onRecoveryAcknowledged = () => navigate({ to: '/login' })
+
+  return { form, showPassword, setShowPassword, isError, resetMutation, recoveryKey, onRecoveryAcknowledged }
 }
 
 export { validateName, validateEmail, validatePassword, validateConfirmPassword }

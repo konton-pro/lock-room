@@ -9,3 +9,10 @@ export type MasterKeyData = {
   masterKeyTag: string;
   masterKeySalt: string;
 };
+
+export type RecoveryKeyData = {
+  encryptedPayload: string;
+  iv: string;
+  tag: string;
+  recoveryKeyHash: string;
+};

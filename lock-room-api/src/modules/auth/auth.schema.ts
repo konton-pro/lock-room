@@ -9,6 +9,10 @@ export const registerSchema = {
     masterKeyIv: z.string(),
     masterKeyTag: z.string(),
     masterKeySalt: z.string(),
+    recoveryEncryptedPayload: z.string(),
+    recoveryIv: z.string(),
+    recoveryTag: z.string(),
+    recoveryKeyHash: z.string(),
   }),
 };
 
