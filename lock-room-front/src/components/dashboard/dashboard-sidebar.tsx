@@ -1,12 +1,13 @@
 import { Terminal } from 'lucide-react'
 import { ScrambleText } from '@/components/ui/scramble-text'
-import { authStore } from '@/stores/auth-store'
+import { useOperatorName } from '@/hooks/use-operator-name'
 
 const NAV_ITEMS = [{ label: 'TERMINAL', Icon: Terminal, active: true }] as const
 
-const getOperatorName = (): string => (authStore.getName() ?? 'UNKNOWN').toUpperCase()
+export const DashboardSidebar = () => {
+  const operatorName = useOperatorName()
 
-export const DashboardSidebar = () => (
+  return (
   <aside
     style={{
       width: '220px',
@@ -39,7 +40,7 @@ export const DashboardSidebar = () => (
         className="m-0 label-tag"
         style={{ color: 'var(--text-primary)', fontSize: '0.7rem', letterSpacing: '0.12em' }}
       >
-        {getOperatorName()}
+        {operatorName}
       </p>
       <p className="m-0 label-tag flex items-center gap-2 mt-1" style={{ color: 'var(--text-muted)' }}>
         <span
@@ -87,4 +88,5 @@ export const DashboardSidebar = () => (
       </span>
     </div>
   </aside>
-)
+  )
+}
