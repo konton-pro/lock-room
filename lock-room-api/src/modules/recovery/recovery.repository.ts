@@ -87,4 +87,19 @@ export const recoveryRepository = {
       .set({ password: hashedPassword, updatedAt: new Date() })
       .where(eq(users.email, email));
   },
+
+  updateUserMasterKey: async (
+    email: string,
+    data: {
+      encryptedMasterKey: string;
+      masterKeyIv: string;
+      masterKeyTag: string;
+      masterKeySalt: string;
+    },
+  ) => {
+    await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.email, email));
+  },
 };

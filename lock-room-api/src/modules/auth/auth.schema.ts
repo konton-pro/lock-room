@@ -5,6 +5,10 @@ export const registerSchema = {
     name: z.string().min(1),
     email: z.email(),
     password: z.string().min(8),
+    encryptedMasterKey: z.string(),
+    masterKeyIv: z.string(),
+    masterKeyTag: z.string(),
+    masterKeySalt: z.string(),
   }),
 };
 

@@ -3,6 +3,7 @@ import {
   index,
   pgTable,
   serial,
+  text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -21,6 +22,10 @@ export const users = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     password: varchar("password", { length: 255 }).notNull(),
+    encryptedMasterKey: text("encrypted_master_key"),
+    masterKeyIv: varchar("master_key_iv", { length: 64 }),
+    masterKeyTag: varchar("master_key_tag", { length: 64 }),
+    masterKeySalt: varchar("master_key_salt", { length: 64 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

@@ -3,6 +3,9 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { authMutations } from '@/queries/auth'
+import { generateRandomKey, deriveKeyFromPassword } from '@/lib/crypto/keys'
+import { encrypt } from '@/lib/crypto/cipher'
+import { toBase64 } from '@/lib/crypto/encoding'
 
 const validateName = (value: string) =>
   value.trim().length < 1 ? 'NAME_REQUIRED' : undefined
@@ -16,18 +19,40 @@ const validatePassword = (value: string) =>
 const validateConfirmPassword = (value: string, password: string) =>
   value !== password ? 'PASSWORDS_DO_NOT_MATCH' : undefined
 
+const buildMasterKeyPayload = async (password: string) => {
+  const masterKey = generateRandomKey()
+  const saltBytes = crypto.getRandomValues(new Uint8Array(16))
+  const wrapKey = await deriveKeyFromPassword(password, saltBytes.buffer as ArrayBuffer)
+  const { encrypted, iv, tag } = await encrypt(
+    new TextEncoder().encode(masterKey).buffer as ArrayBuffer,
+    wrapKey,
+  )
+  return {
+    encryptedMasterKey: encrypted,
+    masterKeyIv: iv,
+    masterKeyTag: tag,
+    masterKeySalt: toBase64(saltBytes.buffer as ArrayBuffer),
+  }
+}
+
 export const useRegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
-  const { mutateAsync, isError, reset: resetMutation } = useMutation({
-    ...authMutations.register(),
-    onSuccess: () => navigate({ to: '/login' }),
-  })
+  const { mutateAsync, isError, reset: resetMutation } = useMutation(authMutations.register())
 
   const form = useForm({
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
-    onSubmit: ({ value }) => mutateAsync({ name: value.name, email: value.email.toLowerCase(), password: value.password }),
+    onSubmit: async ({ value }) => {
+      const masterKeyPayload = await buildMasterKeyPayload(value.password)
+      await mutateAsync({
+        name: value.name,
+        email: value.email.toLowerCase(),
+        password: value.password,
+        ...masterKeyPayload,
+      })
+      navigate({ to: '/login' })
+    },
     validators: {
       onSubmit: ({ value }) =>
         validateName(value.name) ||

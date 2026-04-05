@@ -12,11 +12,12 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     "/register",
     async ({ body, set }) => {
       const data = registerSchema.body.parse(body);
-      const user = await authService.register(
-        data.name,
-        data.email,
-        data.password,
-      );
+      const user = await authService.register(data.name, data.email, data.password, {
+        encryptedMasterKey: data.encryptedMasterKey,
+        masterKeyIv: data.masterKeyIv,
+        masterKeyTag: data.masterKeyTag,
+        masterKeySalt: data.masterKeySalt,
+      });
       set.status = 201;
       return { id: user.cuid, email: user.email };
     },
@@ -26,9 +27,12 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     "/login",
     async ({ body, jwt }) => {
       const data = loginSchema.body.parse(body);
-      const payload = await authService.login(data.email, data.password);
-      const token = await jwt.sign(payload);
-      return { token };
+      const { jwtPayload, masterKeyData } = await authService.login(
+        data.email,
+        data.password,
+      );
+      const token = await jwt.sign(jwtPayload);
+      return { token, ...masterKeyData };
     },
     loginDocs,
   );

@@ -32,4 +32,8 @@ export type ResetRecoveryPayload = {
   newEncryptedPayload: string
   newIv: string
   newTag: string
+  newEncryptedMasterKey: string
+  newMasterKeyIv: string
+  newMasterKeyTag: string
+  newMasterKeySalt: string
 }

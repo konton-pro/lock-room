@@ -91,6 +91,13 @@ export const recoveryService = {
 
     await recoveryRepository.updateUserPassword(input.email, hashedPassword);
 
+    await recoveryRepository.updateUserMasterKey(input.email, {
+      encryptedMasterKey: input.newEncryptedMasterKey,
+      masterKeyIv: input.newMasterKeyIv,
+      masterKeyTag: input.newMasterKeyTag,
+      masterKeySalt: input.newMasterKeySalt,
+    });
+
     await recoveryRepository.updatePayload(recovery.userId, {
       encryptedPayload: l2.encrypted,
       clientIv: Buffer.from(input.newIv, "base64"),

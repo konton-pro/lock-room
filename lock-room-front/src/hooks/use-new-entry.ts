@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { vaultMutations } from '@/queries/vault'
-import { generateRandomKey, importRawKey } from '@/lib/crypto/keys'
+import { importRawKey } from '@/lib/crypto/keys'
 import { toBase64 } from '@/lib/crypto/encoding'
+import { vaultKeyStore } from '@/stores/vault-key-store'
 
 const encryptField = async (plaintext: string, key: CryptoKey, iv: Uint8Array): Promise<string> => {
   const encoded = new TextEncoder().encode(plaintext)
@@ -12,7 +13,7 @@ const encryptField = async (plaintext: string, key: CryptoKey, iv: Uint8Array): 
 
 export const useNewEntry = (onClose: () => void) => {
   const queryClient = useQueryClient()
-  const [generatedKey] = useState(() => generateRandomKey())
+  const masterKey = vaultKeyStore.getKey() ?? ''
   const [error, setError] = useState<string | null>(null)
 
   const { mutateAsync, isPending } = useMutation({
@@ -23,9 +24,9 @@ export const useNewEntry = (onClose: () => void) => {
     },
   })
 
-  const submit = async (header: string, body: string, keyHex: string) => {
+  const submit = async (header: string, body: string) => {
     setError(null)
-    const key = await importRawKey(keyHex)
+    const key = await importRawKey(masterKey)
     const iv = crypto.getRandomValues(new Uint8Array(12))
     const clientIv = toBase64(iv.buffer as ArrayBuffer)
     const encryptedHeader = await encryptField(header, key, iv)
@@ -33,5 +34,5 @@ export const useNewEntry = (onClose: () => void) => {
     await mutateAsync({ encryptedHeader, encryptedBody, clientIv })
   }
 
-  return { submit, isPending, generatedKey, error, setError }
+  return { submit, isPending, masterKey, error, setError }
 }

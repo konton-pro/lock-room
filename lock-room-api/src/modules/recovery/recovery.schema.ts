@@ -24,5 +24,9 @@ export const resetRecoverySchema = {
     newEncryptedPayload: z.string(),
     newIv: z.string(),
     newTag: z.string(),
+    newEncryptedMasterKey: z.string(),
+    newMasterKeyIv: z.string(),
+    newMasterKeyTag: z.string(),
+    newMasterKeySalt: z.string(),
   }),
 };
