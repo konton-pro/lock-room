@@ -81,16 +81,15 @@ export const VaultCard = ({ item }: { item: VaultListItem }) => {
         <button
           type="button"
           onClick={copy}
-          disabled={!body}
           className="label-tag flex-shrink-0 transition-colors"
           style={{
             background: 'none',
             border: 'none',
-            cursor: body ? 'pointer' : 'default',
+            cursor: 'pointer',
             color: copied ? '#4ade80' : 'var(--text-muted)',
             padding: '0 2px',
           }}
-          onMouseEnter={(e) => { if (body && !copied) e.currentTarget.style.color = 'var(--text-primary)' }}
+          onMouseEnter={(e) => { if (!copied) e.currentTarget.style.color = 'var(--text-primary)' }}
           onMouseLeave={(e) => { if (!copied) e.currentTarget.style.color = 'var(--text-muted)' }}
         >
           {copied ? '[OK]' : '[CPY]'}
