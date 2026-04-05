@@ -11,6 +11,7 @@ export const rateLimitPlugin = new Elysia({ name: "plugin:rate-limit" })
       duration: 60_000,
       max: serverConfig.maxRequestsPerMinute,
       context: new DefaultContext(),
+      countFailedRequest: true,
       generator: async (req, server, { jwt }) => await rateLimitHelpers.generateKey(req, jwt as any),
     }),
   );
