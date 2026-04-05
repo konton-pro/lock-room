@@ -42,7 +42,7 @@ export const authService = {
   login: async (
     email: string,
     password: string,
-  ): Promise<{ jwtPayload: JwtPayload; masterKeyData: MasterKeyData }> => {
+  ): Promise<{ name: string; jwtPayload: JwtPayload; masterKeyData: MasterKeyData }> => {
     const user = await authRepository.findByEmail(email);
 
     if (!user) throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
@@ -61,6 +61,7 @@ export const authService = {
       throw new UnprocessableEntityException(AUTH_ERRORS.MISSING_MASTER_KEY);
 
     return {
+      name: user.name,
       jwtPayload: { sub: user.cuid, email: user.email },
       masterKeyData: {
         encryptedMasterKey: user.encryptedMasterKey,

@@ -37,6 +37,7 @@ export const useLoginForm = () => {
         password: value.password,
       })
       authStore.setToken(data.token)
+      authStore.setName(data.name)
       const masterKey = await decryptMasterKey(data, value.password)
       vaultKeyStore.setKey(masterKey)
       navigate({ to: '/dashboard' })

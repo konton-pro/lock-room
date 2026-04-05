@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'lock-room:token'
+const NAME_KEY = 'lock-room:name'
 
 type AuthListener = () => void
 
@@ -16,7 +17,14 @@ export const authStore = {
 
   clearToken: (): void => {
     localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(NAME_KEY)
     notify()
+  },
+
+  getName: (): string | null => localStorage.getItem(NAME_KEY),
+
+  setName: (name: string): void => {
+    localStorage.setItem(NAME_KEY, name)
   },
 
   isAuthenticated: (): boolean => authStore.getToken() !== null,

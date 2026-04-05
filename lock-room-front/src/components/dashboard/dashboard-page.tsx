@@ -29,14 +29,6 @@ const TopBar = () => (
       >
         DASHBOARD
       </span>
-      <span
-        className="label-tag transition-colors"
-        style={{ color: 'var(--text-muted)', cursor: 'pointer' }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-      >
-        ARCHIVE
-      </span>
     </nav>
 
     <div className="flex items-center gap-4">
@@ -66,11 +58,12 @@ const TopBar = () => (
 export const DashboardPage = () => {
   const { data: items = [], isLoading } = useQuery(vaultQueries.list())
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false)
+  const openNewEntry = () => setIsNewEntryOpen(true)
 
   return (
     <div className="flex" style={{ minHeight: '100vh' }}>
       {isNewEntryOpen && <NewEntryModal onClose={() => setIsNewEntryOpen(false)} />}
-      <DashboardSidebar onNewEntry={() => setIsNewEntryOpen(true)} />
+      <DashboardSidebar />
 
       <div className="flex flex-col flex-1" style={{ overflow: 'hidden' }}>
         <TopBar />
@@ -94,14 +87,13 @@ export const DashboardPage = () => {
                 SUB_PROTOCOL: 0X882A / STATUS: SECURE
               </p>
             </div>
-            <div className="text-right">
-              <p className="label-tag m-0" style={{ color: 'var(--text-muted)' }}>
-                LOC: 127.0.0.1
-              </p>
-              <p className="label-tag m-0 mt-1" style={{ color: 'var(--text-muted)' }}>
-                TS: {SESSION_TS}
-              </p>
-            </div>
+            <button
+              type="button"
+              className="btn-primary text-xs"
+              onClick={openNewEntry}
+            >
+              [ NEW_ENTRY ]
+            </button>
           </div>
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 2rem' }} />

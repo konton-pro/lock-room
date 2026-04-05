@@ -41,12 +41,12 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     "/login",
     async ({ body, jwt }) => {
       const data = loginSchema.body.parse(body);
-      const { jwtPayload, masterKeyData } = await authService.login(
+      const { name, jwtPayload, masterKeyData } = await authService.login(
         data.email,
         data.password,
       );
       const token = await jwt.sign(jwtPayload);
-      return { token, ...masterKeyData };
+      return { token, name, ...masterKeyData };
     },
     loginDocs,
   );

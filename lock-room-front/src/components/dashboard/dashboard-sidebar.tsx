@@ -1,9 +1,12 @@
-import { Terminal, Settings } from 'lucide-react'
+import { Terminal } from 'lucide-react'
 import { ScrambleText } from '@/components/ui/scramble-text'
+import { authStore } from '@/stores/auth-store'
 
 const NAV_ITEMS = [{ label: 'TERMINAL', Icon: Terminal, active: true }] as const
 
-export const DashboardSidebar = ({ onNewEntry }: { onNewEntry: () => void }) => (
+const getOperatorName = (): string => (authStore.getName() ?? 'UNKNOWN').toUpperCase()
+
+export const DashboardSidebar = () => (
   <aside
     style={{
       width: '220px',
@@ -36,7 +39,7 @@ export const DashboardSidebar = ({ onNewEntry }: { onNewEntry: () => void }) => 
         className="m-0 label-tag"
         style={{ color: 'var(--text-primary)', fontSize: '0.7rem', letterSpacing: '0.12em' }}
       >
-        OPERATOR_00
+        {getOperatorName()}
       </p>
       <p className="m-0 label-tag flex items-center gap-2 mt-1" style={{ color: 'var(--text-muted)' }}>
         <span
@@ -64,12 +67,8 @@ export const DashboardSidebar = ({ onNewEntry }: { onNewEntry: () => void }) => 
             width: '100%',
             transition: 'color 150ms ease',
           }}
-          onMouseEnter={(e) => {
-            if (!active) e.currentTarget.style.color = 'var(--text-secondary)'
-          }}
-          onMouseLeave={(e) => {
-            if (!active) e.currentTarget.style.color = 'var(--text-muted)'
-          }}
+          onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = 'var(--text-secondary)' }}
+          onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = 'var(--text-muted)' }}
         >
           <Icon size={14} strokeWidth={1.5} style={{ flexShrink: 0 }} />
           <ScrambleText>{label}</ScrambleText>
@@ -79,22 +78,10 @@ export const DashboardSidebar = ({ onNewEntry }: { onNewEntry: () => void }) => 
 
     <div style={{ flex: 1 }} />
 
-    <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)' }}>
-      <button
-        type="button"
-        className="btn-primary text-xs"
-        style={{ width: '100%', justifyContent: 'center' }}
-        onClick={onNewEntry}
-      >
-        [ <ScrambleText>NEW_ENTRY</ScrambleText> ]
-      </button>
-    </div>
-
     <div
       className="flex items-center gap-2"
       style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border)' }}
     >
-      <Settings size={12} strokeWidth={1.5} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
       <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
         SYSTEM_STATUS
       </span>
