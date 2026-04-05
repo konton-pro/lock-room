@@ -16,7 +16,7 @@ export default function Footer() {
 
         <div className="flex items-center gap-6 text-xs tracking-widest">
           <a
-            href="#"
+            href="https://lockroom.api.konton.pro"
             style={{ color: 'var(--text-muted)' }}
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
@@ -25,7 +25,7 @@ export default function Footer() {
             [ DOCS ]
           </a>
           <a
-            href="#"
+            href="https://github.com/konton-pro/lock-room"
             style={{ color: 'var(--text-muted)' }}
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}

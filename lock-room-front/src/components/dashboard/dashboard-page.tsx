@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { vaultQueries } from '@/queries/vault'
 import { useOperatorName } from '@/hooks/use-operator-name'
+import { useLogout } from '@/hooks/use-logout'
 import { DashboardSidebar } from './dashboard-sidebar'
 import { VaultCard } from './vault-card'
 import { NewEntryModal } from './new-entry-modal'
 
 const TopBar = () => {
   const operatorName = useOperatorName()
+  const logout = useLogout()
 
   return (
     <div
@@ -63,9 +64,9 @@ const TopBar = () => {
         >
           ⚙
         </button>
-        <Link to="/" className="btn-ghost text-xs">
+        <button type="button" className="btn-ghost text-xs" onClick={logout}>
           [ LOGOUT ]
-        </Link>
+        </button>
       </div>
     </div>
   )
