@@ -129,7 +129,7 @@ export const RegisterForm = () => {
                       placeholder="YOUR_NAME"
                       autoComplete="name"
                       autoFocus
-                      className="flex-1 bg-transparent outline-none text-sm tracking-widest uppercase"
+                      className="flex-1 bg-transparent outline-none text-sm tracking-widest"
                       style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
                     />
                   </div>
@@ -179,12 +179,12 @@ export const RegisterForm = () => {
                       value={field.state.value}
                       onChange={(e) => {
                         clearMutationError()
-                        field.handleChange(e.target.value)
+                        field.handleChange(e.target.value.toLowerCase())
                       }}
                       onBlur={field.handleBlur}
-                      placeholder="USER@DOMAIN.COM"
+                      placeholder="user@domain.com"
                       autoComplete="email"
-                      className="flex-1 bg-transparent outline-none text-sm tracking-widest uppercase"
+                      className="flex-1 bg-transparent outline-none text-sm tracking-widest"
                       style={{ fontFamily: 'var(--font-mono)', color: '#4ade80', border: 'none', caretColor: '#4ade80' }}
                     />
                   </div>

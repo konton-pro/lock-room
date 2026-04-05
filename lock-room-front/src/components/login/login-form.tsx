@@ -18,7 +18,6 @@ const TerminalField = ({
   autoFocus,
   suffix,
   error,
-  uppercase = false,
 }: {
   label: string
   value: string
@@ -28,7 +27,6 @@ const TerminalField = ({
   autoFocus?: boolean
   suffix?: React.ReactNode
   error?: string
-  uppercase?: boolean
 }) => (
   <div className="flex flex-col gap-2">
     <div
@@ -72,7 +70,6 @@ const TerminalField = ({
             color: '#4ade80',
             border: 'none',
             caretColor: '#4ade80',
-            textTransform: uppercase ? 'uppercase' : 'none',
           }}
         />
         {suffix}
@@ -153,12 +150,11 @@ export const LoginForm = () => {
                 value={field.state.value}
                 onChange={(v) => {
                   if (isError) resetMutation()
-                  field.handleChange(v)
+                  field.handleChange(v.toLowerCase())
                 }}
                 type="email"
-                placeholder="USER@DOMAIN.COM"
+                placeholder="user@domain.com"
                 autoFocus
-                uppercase
                 error={field.state.meta.errors[0] as string | undefined}
               />
             )}
