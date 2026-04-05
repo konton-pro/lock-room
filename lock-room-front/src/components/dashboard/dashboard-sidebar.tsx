@@ -9,13 +9,12 @@ export const DashboardSidebar = () => {
 
   return (
   <aside
+    className="hidden md:flex md:flex-col"
     style={{
       width: '220px',
       flexShrink: 0,
       borderRight: '1px solid var(--border)',
       background: 'var(--bg)',
-      display: 'flex',
-      flexDirection: 'column',
       height: '100vh',
       position: 'sticky',
       top: 0,
