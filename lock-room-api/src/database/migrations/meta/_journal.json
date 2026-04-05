@@ -22,6 +22,13 @@
       "when": 1775345084354,
       "tag": "0002_blushing_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775405478320,
+      "tag": "0003_dazzling_paibok",
+      "breakpoints": true
     }
   ]
 }

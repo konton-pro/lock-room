@@ -4,9 +4,12 @@ import { serverConfig } from "@configs/server.config";
 
 export const errorHandlerPlugin = new Elysia({
   name: "plugin:error-handler",
-}).onError({ as: "global" }, ({ error, set }) => {
-  const mapper = errorMappers.find(({ match }) => match(error))!;
-  const { status, body } = mapper.map(error);
+}).onError({ as: "global" }, ({ error, set, request, code }) => {
+  const mapper = errorMappers.find(({ match }) =>
+    match({ error, code, request })
+  )!;
+  
+  const { status, body } = mapper.map({ error, code, request });
 
   set.status = status;
 

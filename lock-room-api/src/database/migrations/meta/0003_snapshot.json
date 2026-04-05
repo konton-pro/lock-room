@@ -1,0 +1,366 @@
+{
+  "id": "b3a6a5d6-a3bb-4d4a-a400-39d98b5ea758",
+  "prevId": "5f8a482e-70c9-479f-9585-8bead35ce65a",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.recovery_keys": {
+      "name": "recovery_keys",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cuid": {
+          "name": "cuid",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_payload": {
+          "name": "encrypted_payload",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_iv": {
+          "name": "client_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_tag": {
+          "name": "client_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_iv": {
+          "name": "server_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_tag": {
+          "name": "server_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recovery_key_hash": {
+          "name": "recovery_key_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "recovery_keys_user_id_users_id_fk": {
+          "name": "recovery_keys_user_id_users_id_fk",
+          "tableFrom": "recovery_keys",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "recovery_keys_cuid_unique": {
+          "name": "recovery_keys_cuid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cuid"
+          ]
+        },
+        "recovery_keys_user_id_unique": {
+          "name": "recovery_keys_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cuid": {
+          "name": "cuid",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_master_key": {
+          "name": "encrypted_master_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "master_key_iv": {
+          "name": "master_key_iv",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "master_key_tag": {
+          "name": "master_key_tag",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "master_key_salt": {
+          "name": "master_key_salt",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "users_email_idx": {
+          "name": "users_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_cuid_unique": {
+          "name": "users_cuid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cuid"
+          ]
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vault": {
+      "name": "vault",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cuid": {
+          "name": "cuid",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_header": {
+          "name": "encrypted_header",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_body": {
+          "name": "encrypted_body",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_iv": {
+          "name": "client_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_header_iv": {
+          "name": "server_header_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_header_tag": {
+          "name": "server_header_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_body_iv": {
+          "name": "server_body_iv",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_body_tag": {
+          "name": "server_body_tag",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "vault_user_id_idx": {
+          "name": "vault_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "vault_user_id_users_id_fk": {
+          "name": "vault_user_id_users_id_fk",
+          "tableFrom": "vault",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "vault_cuid_unique": {
+          "name": "vault_cuid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cuid"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
