@@ -35,7 +35,7 @@ export const useVaultCard = (item: VaultListItem) => {
     retry: false,
   })
 
-  const { data: body = null, isPending: loadingBody } = useQuery({
+  const { data: body = null, isFetching: loadingBody } = useQuery({
     ...bodyQueryOptions,
     enabled: revealed,
   })
