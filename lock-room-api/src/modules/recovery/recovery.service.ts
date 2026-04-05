@@ -7,7 +7,6 @@ import type {
   StoreRecoveryInput,
   ResetRecoveryInput,
 } from "@modules/recovery/recovery.types";
-import { db } from "@database/index";
 
 export const recoveryService = {
   store: async (
@@ -15,18 +14,17 @@ export const recoveryService = {
     userCuid: string,
     crypto: ServerCrypto,
   ) => {
-    const user = await db.query.users.findFirst({
-      where: (u, { eq }) => eq(u.cuid, userCuid),
-      columns: { id: true },
-    });
+    const userId =
+      await recoveryRepository.findUserIdByCuid(userCuid);
 
-    if (!user) throw new NotFoundException(RECOVERY_ERRORS.USER_NOT_FOUND);
+    if (!userId)
+      throw new NotFoundException(RECOVERY_ERRORS.USER_NOT_FOUND);
 
     const payloadBuffer = Buffer.from(input.encryptedPayload, "base64");
     const l2 = crypto.encrypt(payloadBuffer);
 
     return recoveryRepository.upsert({
-      userId: user.id,
+      userId,
       encryptedPayload: l2.encrypted,
       clientIv: Buffer.from(input.iv, "base64"),
       clientTag: Buffer.from(input.tag, "base64"),

@@ -8,6 +8,14 @@ import type {
 } from "@modules/recovery/recovery.types";
 
 export const recoveryRepository = {
+  findUserIdByCuid: async (cuid: string) => {
+    const user = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.cuid, cuid),
+      columns: { id: true },
+    });
+    return user?.id ?? null;
+  },
+
   findByUserCuid: async (userCuid: string) => {
     const user = await db.query.users.findFirst({
       where: (u, { eq }) => eq(u.cuid, userCuid),
