@@ -71,18 +71,7 @@ const TerminalField = ({
 )
 
 export const LoginForm = () => {
-  const {
-    email,
-    password,
-    showPassword,
-    setShowPassword,
-    isPending,
-    isError,
-    isReady,
-    onEmailChange,
-    onPasswordChange,
-    handleSubmit,
-  } = useLoginForm()
+  const { form, showPassword, setShowPassword, isError, resetMutation } = useLoginForm()
 
   return (
     <div
@@ -130,38 +119,56 @@ export const LoginForm = () => {
         </div>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (isError) resetMutation()
+            form.handleSubmit()
+          }}
           className="flex flex-col gap-6 fade-up"
           style={{ animationDelay: '200ms' }}
         >
-          <TerminalField
-            label="INPUT_IDENTIFIER"
-            value={email}
-            onChange={onEmailChange}
-            type="email"
-            placeholder="USER@DOMAIN.COM"
-            autoFocus
-          />
+          <form.Field name="email">
+            {(field) => (
+              <TerminalField
+                label="INPUT_IDENTIFIER"
+                value={field.state.value}
+                onChange={(v) => {
+                  if (isError) resetMutation()
+                  field.handleChange(v)
+                }}
+                type="email"
+                placeholder="USER@DOMAIN.COM"
+                autoFocus
+              />
+            )}
+          </form.Field>
 
-          <TerminalField
-            label="INPUT_MASTER_HASH"
-            value={password}
-            onChange={onPasswordChange}
-            type={showPassword ? 'text' : 'password'}
-            placeholder="ENTER_PASSWORD"
-            suffix={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="flex-shrink-0 label-tag transition-colors"
-                style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-              >
-                {showPassword ? '[HIDE]' : '[SHOW]'}
-              </button>
-            }
-          />
+          <form.Field name="password">
+            {(field) => (
+              <TerminalField
+                label="INPUT_MASTER_HASH"
+                value={field.state.value}
+                onChange={(v) => {
+                  if (isError) resetMutation()
+                  field.handleChange(v)
+                }}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="ENTER_PASSWORD"
+                suffix={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="flex-shrink-0 label-tag transition-colors"
+                    style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  >
+                    {showPassword ? '[HIDE]' : '[SHOW]'}
+                  </button>
+                }
+              />
+            )}
+          </form.Field>
 
           {isError && (
             <p
@@ -172,21 +179,28 @@ export const LoginForm = () => {
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={isPending || !isReady}
-            className="btn-primary w-full justify-center"
-            style={{
-              opacity: isPending || !isReady ? 0.5 : 1,
-              cursor: isPending || !isReady ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {isPending ? (
-              <>{'[ '}<span className="cursor-blink" style={{ background: 'currentColor' }} />{' PROCESSING ]'}</>
-            ) : (
-              <>[ <ScrambleText>INITIALIZE_SESSION</ScrambleText> ]</>
+          <form.Subscribe selector={(state) => ({
+            canSubmit: state.canSubmit,
+            isSubmitting: state.isSubmitting,
+          })}>
+            {({ canSubmit, isSubmitting }) => (
+              <button
+                type="submit"
+                disabled={isSubmitting || !canSubmit}
+                className="btn-primary w-full justify-center"
+                style={{
+                  opacity: isSubmitting || !canSubmit ? 0.5 : 1,
+                  cursor: isSubmitting || !canSubmit ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isSubmitting ? (
+                  <>{'[ '}<span className="cursor-blink" style={{ background: 'currentColor' }} />{' PROCESSING ]'}</>
+                ) : (
+                  <>[ <ScrambleText>INITIALIZE_SESSION</ScrambleText> ]</>
+                )}
+              </button>
             )}
-          </button>
+          </form.Subscribe>
 
           <div className="flex items-center justify-between">
             <Link

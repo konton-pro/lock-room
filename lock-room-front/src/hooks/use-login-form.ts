@@ -1,42 +1,26 @@
 import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { authMutations } from '@/queries/auth'
+import { authStore } from '@/stores/auth-store'
 
 export const useLoginForm = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
-  const { mutate: login, isPending, isError, reset } = useMutation({
+  const { mutateAsync, isError, reset: resetMutation } = useMutation({
     ...authMutations.login(),
-    onSuccess: () => navigate({ to: '/dashboard' }),
+    onSuccess: (data) => {
+      authStore.setToken(data.token)
+      navigate({ to: '/dashboard' })
+    },
   })
 
-  const handleFieldChange = (setter: (v: string) => void) => (value: string) => {
-    if (isError) reset()
-    setter(value)
-  }
+  const form = useForm({
+    defaultValues: { email: '', password: '' },
+    onSubmit: ({ value }) => mutateAsync(value),
+  })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!email.trim() || !password.trim()) return
-    login({ email, password })
-  }
-
-  const isReady = email.trim().length > 0 && password.trim().length > 0
-
-  return {
-    email,
-    password,
-    showPassword,
-    setShowPassword,
-    isPending,
-    isError,
-    isReady,
-    onEmailChange: handleFieldChange(setEmail),
-    onPasswordChange: handleFieldChange(setPassword),
-    handleSubmit,
-  }
+  return { form, showPassword, setShowPassword, isError, resetMutation }
 }

@@ -1,8 +1,8 @@
-export type LoginPayload = { email: string; password: string }
-export type RegisterPayload = { name: string; email: string; password: string }
+import { http } from '@/lib/http'
+import type { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from '@/types/auth'
 
-export const login = (_payload: LoginPayload): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, 1200))
+export const login = (payload: LoginPayload): Promise<LoginResponse> =>
+  http.post('auth/login', { json: payload }).json<LoginResponse>()
 
-export const register = (_payload: RegisterPayload): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, 1200))
+export const register = (payload: RegisterPayload): Promise<RegisterResponse> =>
+  http.post('auth/register', { json: payload }).json<RegisterResponse>()

@@ -1,5 +1,5 @@
 import { login, register } from '@/services/auth'
-import type { LoginPayload, RegisterPayload } from '@/services/auth'
+import type { LoginPayload, RegisterPayload } from '@/types/auth'
 
 export const authMutations = {
   login: () => ({
