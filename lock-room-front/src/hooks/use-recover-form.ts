@@ -32,6 +32,7 @@ export const useRecoverForm = () => {
   const [storedEmail, setStoredEmail] = useState('')
   const [storedRecoveryKey, setStoredRecoveryKey] = useState('')
   const [masterKey, setMasterKey] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
   const { mutateAsync: verifyKey, isError: verifyError, reset: resetVerify } = useMutation(recoveryMutations.verify())
@@ -111,6 +112,8 @@ export const useRecoverForm = () => {
     resetError,
     resetVerify,
     resetReset,
+    showPassword,
+    setShowPassword,
     validateEmail,
     validateRecoveryKey,
     validatePassword,

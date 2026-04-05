@@ -86,6 +86,8 @@ export const RecoverForm = () => {
     resetError,
     resetVerify,
     resetReset,
+    showPassword,
+    setShowPassword,
     validateEmail,
     validateRecoveryKey,
     validatePassword,
@@ -232,10 +234,22 @@ export const RecoverForm = () => {
                   value={field.state.value}
                   onChange={(v) => { if (resetError) resetReset(); field.handleChange(v) }}
                   onBlur={field.handleBlur}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="enter new password"
                   autoFocus
                   error={field.state.meta.errors[0] as string | undefined}
+                  suffix={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="flex-shrink-0 label-tag transition-colors"
+                      style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                    >
+                      {showPassword ? '[HIDE]' : '[SHOW]'}
+                    </button>
+                  }
                 />
               )}
             </resetForm.Field>
@@ -253,9 +267,21 @@ export const RecoverForm = () => {
                   value={field.state.value}
                   onChange={(v) => { if (resetError) resetReset(); field.handleChange(v) }}
                   onBlur={field.handleBlur}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="confirm new password"
                   error={field.state.meta.errors[0] as string | undefined}
+                  suffix={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="flex-shrink-0 label-tag transition-colors"
+                      style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                    >
+                      {showPassword ? '[HIDE]' : '[SHOW]'}
+                    </button>
+                  }
                 />
               )}
             </resetForm.Field>
