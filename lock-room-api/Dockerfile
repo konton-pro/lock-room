@@ -20,4 +20,4 @@ COPY --from=build /app/package.json ./package.json
 ENV PORT=3000
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "bunx drizzle-kit migrate && bun run src/index.ts"]
+CMD ["bun", "run", "src/index.ts"]
