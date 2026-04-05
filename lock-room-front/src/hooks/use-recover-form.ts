@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
@@ -46,7 +45,6 @@ export const useRecoverForm = () => {
   const { mutateAsync: resetAccount, isError: resetError, reset: resetReset } = useMutation(recoveryMutations.reset())
 
   const verifyForm = useForm({
-    validatorAdapter: zodValidator(),
     validators: { onSubmit: verifySchema },
     defaultValues: { email: '', recoveryKey: '' },
     onSubmit: async ({ value }) => {
@@ -67,7 +65,6 @@ export const useRecoverForm = () => {
   })
 
   const resetForm = useForm({
-    validatorAdapter: zodValidator(),
     validators: { onSubmit: resetSchema },
     defaultValues: { newPassword: '', confirmPassword: '' },
     onSubmit: async ({ value }) => {

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
@@ -36,7 +35,6 @@ export const useLoginForm = () => {
   const { mutateAsync, isError, reset: resetMutation } = useMutation(authMutations.login())
 
   const form = useForm({
-    validatorAdapter: zodValidator(),
     validators: { onSubmit: loginSchema },
     defaultValues: { email: '', password: '' },
     onSubmit: async ({ value }) => {
