@@ -1,17 +1,15 @@
 export const rateLimitHelpers = {
-  extractUserId(req: Request): string | null {
+  async extractUserId(req: Request, jwt?: any): Promise<string | null> {
     try {
       const token = req.headers.get("authorization")?.replace("Bearer ", "");
 
       if (!token) return null;
+      if (!jwt) return null;
 
-      const payload = token.split(".")[1];
-
+      const payload = await jwt.verify(token);
       if (!payload) return null;
 
-      const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
-
-      return (decoded.sub as string) ?? null;
+      return (payload.sub as string) ?? null;
     } catch {
       return null;
     }
@@ -25,7 +23,7 @@ export const rateLimitHelpers = {
     );
   },
 
-  generateKey(req: Request): string {
-    return this.extractUserId(req) ?? this.extractIp(req);
+  async generateKey(req: Request, jwt?: any): Promise<string> {
+    return (await this.extractUserId(req, jwt)) ?? this.extractIp(req);
   },
 };
