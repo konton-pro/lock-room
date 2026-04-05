@@ -37,6 +37,13 @@ const FEATURES = [
       'All cryptographic operations run inside your browser or native client. The network sees only encrypted payloads.',
   },
   {
+    id: 'RECOVERY_KEY',
+    title: 'RECOVERY_KEY',
+    category: 'RESILIENCE',
+    description:
+      'Generate a recovery key that encrypts your master key client-side. If you lose your password, recover your vault without the server ever seeing the key.',
+  },
+  {
     id: 'OPEN_PROTOCOL',
     title: 'OPEN_PROTOCOL',
     category: 'TRANSPARENCY',

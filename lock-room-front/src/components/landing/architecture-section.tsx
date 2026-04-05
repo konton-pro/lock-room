@@ -17,11 +17,19 @@ const STEPS = [
   },
   {
     index: '03',
-    label: 'BLIND_STORAGE',
-    title: 'SERVER_STORES_OPAQUE_BLOBS',
+    label: 'DOUBLE_LAYER_ENCRYPTION',
+    title: 'SERVER_ADDS_SECOND_LAYER',
     description:
-      'The backend stores and retrieves encrypted blobs. It has no access to keys, no ability to decrypt, and no knowledge of what you store. Structural server-blindness.',
-    detail: 'server.store(user_id, ciphertext) → void',
+      'The server applies its own AES-GCM-256 encryption on top of your already-encrypted data. Even if the database leaks, attackers face two independent encryption layers.',
+    detail: 'server.encrypt(client_ciphertext, server_key) → L2_ciphertext',
+  },
+  {
+    index: '04',
+    label: 'RECOVERY_KEY',
+    title: 'ZERO_KNOWLEDGE_RECOVERY',
+    description:
+      'Generate a recovery key stored only by you. It encrypts your master key client-side and sends the opaque blob to the server. Lost your password? Decrypt locally with the recovery key — the server never sees it.',
+    detail: 'AES-GCM(master_key, recovery_key) → recovery_blob → server',
   },
 ] as const
 

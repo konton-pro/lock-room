@@ -4,14 +4,18 @@ const SECURITY_SPECS: { label: string; value: string; danger?: boolean }[] = [
   { label: 'ITERATIONS', value: '600,000' },
   { label: 'IV_LENGTH', value: '96 BITS' },
   { label: 'TAG_LENGTH', value: '128 BITS' },
+  { label: 'ENCRYPTION_LAYERS', value: '2 (CLIENT + SERVER)' },
   { label: 'TRANSPORT', value: 'TLS 1.3' },
   { label: 'SERVER_KNOWLEDGE', value: 'NONE' },
+  { label: 'RECOVERY_METHOD', value: 'CLIENT-SIDE KEY' },
   { label: 'PLAINTEXT_STORAGE', value: 'NEVER', danger: true },
 ]
 
 const AUDIT_ITEMS = [
   { status: 'VERIFIED', label: 'CRYPTOGRAPHIC_PROTOCOL' },
   { status: 'VERIFIED', label: 'CLIENT_SIDE_ONLY_CRYPTO' },
+  { status: 'VERIFIED', label: 'DOUBLE_LAYER_ENCRYPTION' },
+  { status: 'VERIFIED', label: 'ZERO_KNOWLEDGE_RECOVERY' },
   { status: 'VERIFIED', label: 'NO_TELEMETRY' },
   { status: 'VERIFIED', label: 'OPEN_SOURCE_CODE' },
 ] as const
@@ -98,9 +102,10 @@ export const SecuritySection = () => (
               style={{ color: 'var(--text-secondary)', lineHeight: 1.9, fontFamily: 'var(--font-mono)' }}
             >
               Even if the server infrastructure is fully compromised, attackers
-              gain only meaningless encrypted blobs. Without your master
+              face two independent encryption layers. Without your master
               password, brute-forcing 600k PBKDF2 iterations per attempt is
-              computationally infeasible at any scale.
+              computationally infeasible. Recovery keys are encrypted
+              client-side — the server stores only opaque blobs it cannot read.
             </p>
           </div>
         </div>
