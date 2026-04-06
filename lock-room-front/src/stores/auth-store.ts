@@ -3,7 +3,10 @@ import Cookies from 'js-cookie'
 const TOKEN_KEY = 'lock-room:token'
 const NAME_KEY = 'lock-room:name'
 
-const COOKIE_OPTIONS = { sameSite: 'strict', secure: true } as const
+const COOKIE_OPTIONS = {
+  sameSite: 'strict',
+  secure: import.meta.env.PROD,
+} as const
 
 type AuthListener = () => void
 
