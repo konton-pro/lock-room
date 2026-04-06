@@ -1,5 +1,9 @@
+import Cookies from 'js-cookie'
+
 const TOKEN_KEY = 'lock-room:token'
 const NAME_KEY = 'lock-room:name'
+
+const COOKIE_OPTIONS = { sameSite: 'strict', secure: true } as const
 
 type AuthListener = () => void
 
@@ -8,23 +12,23 @@ let listeners: AuthListener[] = []
 const notify = () => listeners.forEach((fn) => fn())
 
 export const authStore = {
-  getToken: (): string | null => localStorage.getItem(TOKEN_KEY),
+  getToken: (): string | null => Cookies.get(TOKEN_KEY) ?? null,
 
   setToken: (token: string): void => {
-    localStorage.setItem(TOKEN_KEY, token)
+    Cookies.set(TOKEN_KEY, token, COOKIE_OPTIONS)
     notify()
   },
 
   clearToken: (): void => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(NAME_KEY)
+    Cookies.remove(TOKEN_KEY)
+    Cookies.remove(NAME_KEY)
     notify()
   },
 
-  getName: (): string | null => localStorage.getItem(NAME_KEY),
+  getName: (): string | null => Cookies.get(NAME_KEY) ?? null,
 
   setName: (name: string): void => {
-    localStorage.setItem(NAME_KEY, name)
+    Cookies.set(NAME_KEY, name, COOKIE_OPTIONS)
   },
 
   isAuthenticated: (): boolean => authStore.getToken() !== null,
