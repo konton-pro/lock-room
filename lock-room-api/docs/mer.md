@@ -1,4 +1,4 @@
-# MER — Lock Room API
+# ERD — Lock Room API
 
 ```mermaid
 Diagram
@@ -49,9 +49,9 @@ Diagram
     users ||--o| recovery_keys : "has one"
 ```
 
-## Relações
+## Relationships
 
-| De | Para | Tipo | Descrição |
-|----|------|------|-----------|
-| `users` | `vault` | 1:N | Um usuário pode ter múltiplas entradas no vault |
-| `users` | `recovery_keys` | 1:0..1 | Um usuário tem no máximo uma recovery key |
+| From | To | Type | Description |
+|------|----|------|-------------|
+| `users` | `vault` | 1:N | A user can have multiple vault entries |
+| `users` | `recovery_keys` | 1:0..1 | A user has at most one recovery key |
