@@ -4,6 +4,7 @@ import { authStore } from '@/stores/auth-store'
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: () => {
+    if (typeof document === 'undefined') return
     if (!authStore.isAuthenticated()) throw redirect({ to: '/login' })
   },
   component: DashboardPage,
