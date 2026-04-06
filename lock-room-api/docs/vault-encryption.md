@@ -1,6 +1,6 @@
 # Vault — Encryption & Decryption
 
-O vault usa **dupla camada de criptografia (E2EE + server-side)**. O dado nunca chega ao banco em texto puro — nem o servidor consegue ler o conteúdo original sem a master key do usuário.
+O vault usa **dupla camada de criptografia (E2EE + server-side)**. O dado nunca chega ao servidor em texto puro — o cliente já envia tudo criptografado (L1), e o servidor apenas adiciona uma segunda camada (L2) antes de persistir. Sem a master key do usuário, que nunca trafega para o servidor, o conteúdo original é inacessível.
 
 ---
 
