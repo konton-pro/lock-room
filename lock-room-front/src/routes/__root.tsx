@@ -10,8 +10,6 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
-import { ToastContainer } from '../components/ui/toast'
-
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
@@ -75,7 +73,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <AppShell>
             {children}
           </AppShell>
-          <ToastContainer />
           <TanStackDevtools
             config={{
               position: 'bottom-right',
