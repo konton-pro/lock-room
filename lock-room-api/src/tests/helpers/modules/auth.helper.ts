@@ -18,6 +18,7 @@ export const authHelper = {
       }),
     );
 
-    return res.headers.get("set-cookie") ?? "";
+    const setCookie = res.headers.get("set-cookie") ?? "";
+    return setCookie.split(";")[0] ?? "";
   },
 };

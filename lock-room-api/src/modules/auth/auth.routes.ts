@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { sessionGuard, sessionPlugin } from "@plugins/auth/session/session.plugin";
+import { sessionGuard } from "@plugins/auth/session/session.plugin";
 import { sessionHelpers } from "@plugins/auth/session/session.helpers";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { rateLimitAuthPlugin } from "@plugins/infra/rate-limit/rate-limit-auth.plugin";
@@ -10,7 +10,6 @@ import { loginDocs, logoutDocs, registerDocs } from "@modules/auth/auth.docs";
 import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const authRoutes = new Elysia({ prefix: "/auth" })
-  .use(sessionPlugin)
   .use(serverCryptoPlugin)
   .use(rateLimitAuthPlugin)
   .post(
@@ -42,7 +41,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
   )
   .post(
     "/login",
-    async ({ body, requestIpSubnet, requestUserAgentHash, set }) => {
+    async ({ body, request, set }) => {
       const data = loginSchema.body.parse(body);
       const { userCuid, name, masterKeyData } = await authService.login(
         data.email,
@@ -54,6 +53,10 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       const sessionId = sessionHelpers.generateSessionId();
       const sessionIdHash = sessionHelpers.hashSessionId(sessionId);
       const expiresAt = sessionHelpers.getExpiresAt();
+      const requestIpSubnet = sessionHelpers.resolveSubnet(request);
+      const requestUserAgentHash = sessionHelpers.hashUserAgent(
+        request.headers.get("user-agent"),
+      );
 
       await authRepository.createSession({
         userCuid,

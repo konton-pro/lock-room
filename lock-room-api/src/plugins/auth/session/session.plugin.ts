@@ -6,20 +6,8 @@ import { sessionHelpers } from "@plugins/auth/session/session.helpers";
 const MISSING_SESSION = "Missing session";
 const INVALID_SESSION = "Invalid session";
 
-export const sessionPlugin = new Elysia({ name: "plugin:session" }).derive(
-  { as: "scoped" },
-  ({ request }) => {
-    const userAgent = request.headers.get("user-agent");
-    return {
-      requestIpSubnet: sessionHelpers.resolveSubnet(request),
-      requestUserAgentHash: sessionHelpers.hashUserAgent(userAgent),
-    };
-  },
-);
-
 export const sessionGuard = new Elysia({ name: "plugin:session-guard" })
-  .use(sessionPlugin)
-  .derive({ as: "scoped" }, async ({ request, requestIpSubnet, requestUserAgentHash, set }) => {
+  .derive({ as: "scoped" }, async ({ request, set }) => {
     const cookieHeader = request.headers.get("cookie");
     const sessionId = sessionHelpers.extractSessionId(cookieHeader);
 
@@ -32,6 +20,11 @@ export const sessionGuard = new Elysia({ name: "plugin:session-guard" })
     );
 
     if (!session) throw new UnauthorizedException(INVALID_SESSION);
+
+    const requestIpSubnet = sessionHelpers.resolveSubnet(request);
+    const requestUserAgentHash = sessionHelpers.hashUserAgent(
+      request.headers.get("user-agent"),
+    );
 
     const subnetChanged = session.ipSubnet !== requestIpSubnet;
     const userAgentChanged = session.userAgentHash !== requestUserAgentHash;

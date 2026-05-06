@@ -81,6 +81,7 @@ describe("POST /vault", () => {
       body: vaultPayload(),
       ip: "198.51.100.10",
     });
+
     expect(changedSubnet.status).toBe(401);
 
     const reusedCookie = await post("/vault", sessionCookie, vaultPayload());
@@ -252,6 +253,8 @@ describe("DELETE /vault/:id", () => {
   it("deve retornar 404 para item inexistente", async () => {
     const res = await del(`/vault/${createId()}`, sessionCookie);
     const data = await res.json();
+
+    console.log(data);
 
     expect(res.status).toBe(404);
     expect(data.message).toBe(VAULT_ERRORS.NOT_FOUND);
