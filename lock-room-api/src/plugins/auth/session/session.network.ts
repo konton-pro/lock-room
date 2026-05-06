@@ -1,66 +1,140 @@
 import { sessionConfig } from "@configs/session.config";
+import * as ipaddr from "ipaddr.js";
 import { UNKNOWN_VALUE } from "@plugins/auth/session/session.constants";
+import type {
+  SessionIpAddress,
+  SessionNetworkConfig,
+} from "@plugins/auth/session/session.network.types";
 
-const expandIpv6 = (value: string): string[] => {
-  const [headRaw, tailRaw] = value.toLowerCase().split("::");
-  const head = headRaw ? headRaw.split(":").filter(Boolean) : [];
+export class SessionNetworkService {
+  protected static readonly IPV4_SEGMENT_BITS = 8;
+  protected static readonly IPV6_SEGMENT_BITS = 16;
+  protected static readonly IPV4_TOTAL_BITS = 32;
+  protected static readonly IPV6_TOTAL_BITS = 128;
 
-  const tail = tailRaw ? tailRaw.split(":").filter(Boolean) : [];
+  constructor(protected readonly config: SessionNetworkConfig) {}
 
-  const missing = Math.max(0, 8 - (head.length + tail.length));
-  
-  return [...head, ...Array.from({ length: missing }, () => "0"), ...tail].map(
-    (part) => part.padStart(4, "0"),
-  );
-};
+  extractIp(request: Request): string {
+    const forwarded = request.headers.get("x-forwarded-for");
+    if (forwarded)
+      return this.sanitizeIpCandidate(forwarded.split(",")[0] ?? UNKNOWN_VALUE);
 
-const stripPortAndBrackets = (value: string): string => {
-  if (value.startsWith("[") && value.includes("]"))
-    return value.slice(1, value.indexOf("]"));
+    return this.sanitizeIpCandidate(
+      request.headers.get("x-real-ip") ?? UNKNOWN_VALUE,
+    );
+  }
 
-  const parts = value.split(":");
-  if (parts.length === 2 && parts.every((part) => part.length > 0))
-    return parts[0] ?? value;
+  toSubnet(ip: string): string {
+    const address = this.parseAddress(ip);
+    if (!address) return UNKNOWN_VALUE;
 
-  return value;
-};
+    return this.isIpv4Address(address)
+      ? this.toIpv4Subnet(address)
+      : this.toIpv6Subnet(address);
+  }
 
-const toIpv4Subnet = (ip: string): string => {
-  const octets = ip.split(".");
-  if (octets.length !== 4) return UNKNOWN_VALUE;
+  resolveSubnet(request: Request): string {
+    return this.toSubnet(this.extractIp(request));
+  }
 
-  const networkOctets = Math.floor(sessionConfig.ipv4SubnetBits / 8);
-  const subnet = octets
-    .map((octet, index) => (index < networkOctets ? octet : "0"))
-    .join(".");
+  protected clampPrefix(value: number, max: number): number {
+    return Math.max(0, Math.min(max, Math.floor(value)));
+  }
 
-  return `${subnet}/${sessionConfig.ipv4SubnetBits}`;
-};
+  protected applyMask(
+    segments: number[],
+    prefix: number,
+    segmentBits: number,
+  ): number[] {
+    let remaining = prefix;
 
-const toIpv6Subnet = (ip: string): string => {
-  const mappedIpv4 = ip.includes(".") ? ip.split(":").pop() : null;
-  if (mappedIpv4) return toIpv4Subnet(mappedIpv4);
+    return segments.map((segment) => {
+      if (remaining <= 0) return 0;
+      if (remaining >= segmentBits) {
+        remaining -= segmentBits;
+        return segment;
+      }
 
-  const expanded = expandIpv6(ip);
-  const networkGroups = Math.floor(sessionConfig.ipv6SubnetBits / 16);
-  const subnet = expanded
-    .map((group, index) => (index < networkGroups ? group : "0000"))
-    .join(":");
+      const shift = segmentBits - remaining;
+      const mask = ((1 << remaining) - 1) << shift;
+      remaining = 0;
 
-  return `${subnet}/${sessionConfig.ipv6SubnetBits}`;
-};
+      return segment & mask;
+    });
+  }
 
-export const extractIp = (request: Request): string => {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return stripPortAndBrackets(forwarded.split(",")[0]?.trim() ?? UNKNOWN_VALUE);
+  protected sanitizeIpCandidate(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) return UNKNOWN_VALUE;
 
-  return stripPortAndBrackets(request.headers.get("x-real-ip")?.trim() ?? UNKNOWN_VALUE);
-};
+    if (trimmed.startsWith("[") && trimmed.includes("]"))
+      return trimmed.slice(1, trimmed.indexOf("]"));
 
-export const toSubnet = (ip: string): string => {
-  if (ip.includes(".")) return toIpv4Subnet(ip);
-  if (ip.includes(":")) return toIpv6Subnet(ip);
-  return UNKNOWN_VALUE;
-};
+    if (trimmed.includes(".") && trimmed.includes(":")) {
+      const [host, port] = trimmed.split(":");
+      if (host && port && /^\d+$/.test(port)) return host;
+    }
 
-export const resolveSubnet = (request: Request): string => toSubnet(extractIp(request));
+    return trimmed;
+  }
+
+  protected toIpv4Subnet(address: ipaddr.IPv4): string {
+    const prefix = this.clampPrefix(
+      this.config.ipv4SubnetBits,
+      SessionNetworkService.IPV4_TOTAL_BITS,
+    );
+    const subnet = this.applyMask(
+      address.octets,
+      prefix,
+      SessionNetworkService.IPV4_SEGMENT_BITS,
+    ).join(".");
+
+    return `${subnet}/${prefix}`;
+  }
+
+  protected toIpv6Subnet(address: ipaddr.IPv6): string {
+    const prefix = this.clampPrefix(
+      this.config.ipv6SubnetBits,
+      SessionNetworkService.IPV6_TOTAL_BITS,
+    );
+    const subnet = this.applyMask(
+      address.parts,
+      prefix,
+      SessionNetworkService.IPV6_SEGMENT_BITS,
+    )
+      .map((part) => part.toString(16).padStart(4, "0"))
+      .join(":");
+
+    return `${subnet}/${prefix}`;
+  }
+
+  protected parseAddress(ip: string): SessionIpAddress | null {
+    const normalized = this.sanitizeIpCandidate(ip);
+    if (
+      normalized === UNKNOWN_VALUE ||
+      (!normalized.includes(".") && !normalized.includes(":")) ||
+      !ipaddr.isValid(normalized)
+    )
+      return null;
+
+    return ipaddr.process(normalized);
+  }
+
+  protected isIpv4Address(address: SessionIpAddress): address is ipaddr.IPv4 {
+    return "octets" in address;
+  }
+}
+
+const sessionNetworkService = new SessionNetworkService({
+  ipv4SubnetBits: sessionConfig.ipv4SubnetBits,
+  ipv6SubnetBits: sessionConfig.ipv6SubnetBits,
+});
+
+export const extractIp = (request: Request): string =>
+  sessionNetworkService.extractIp(request);
+
+export const toSubnet = (ip: string): string =>
+  sessionNetworkService.toSubnet(ip);
+
+export const resolveSubnet = (request: Request): string =>
+  sessionNetworkService.resolveSubnet(request);
