@@ -1,29 +1,19 @@
+import { sessionHelpers } from "@plugins/auth/session/session.helpers";
+
 export const rateLimitHelpers = {
-  async extractUserId(req: Request, jwt?: any): Promise<string | null> {
-    try {
-      const token = req.headers.get("authorization")?.replace("Bearer ", "");
-
-      if (!token) return null;
-      if (!jwt) return null;
-
-      const payload = await jwt.verify(token);
-      if (!payload) return null;
-
-      return (payload.sub as string) ?? null;
-    } catch {
-      return null;
-    }
+  extractSessionId(req: Request): string | null {
+    const cookieHeader = req.headers.get("cookie");
+    return sessionHelpers.extractSessionId(cookieHeader);
   },
 
   extractIp(req: Request): string {
-    return (
-      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-      req.headers.get("x-real-ip") ??
-      "unknown"
-    );
+    return sessionHelpers.extractIp(req);
   },
 
-  async generateKey(req: Request, jwt?: any): Promise<string> {
-    return (await this.extractUserId(req, jwt)) ?? this.extractIp(req);
+  generateKey(req: Request): string {
+    const sessionId = this.extractSessionId(req);
+    if (sessionId) return `session:${sessionHelpers.hashSessionId(sessionId)}`;
+
+    return `ip:${this.extractIp(req)}`;
   },
 };

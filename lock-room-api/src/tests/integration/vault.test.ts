@@ -19,37 +19,38 @@ const vaultPayload = () => ({
 const makeRequest = (
   method: string,
   path: string,
-  opts: { token?: string; body?: unknown } = {},
+  opts: { sessionCookie?: string; body?: unknown; ip?: string; userAgent?: string } = {},
 ) =>
   app.handle(
     new Request(`http://localhost${path}`, {
       method,
       headers: {
         "Content-Type": "application/json",
-        "x-forwarded-for": faker.internet.ip(),
-        ...(opts.token && { Authorization: `Bearer ${opts.token}` }),
+        "x-forwarded-for": opts.ip ?? "203.0.113.10",
+        "user-agent": opts.userAgent ?? "lock-room-tests/1.0",
+        ...(opts.sessionCookie && { Cookie: opts.sessionCookie }),
       },
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
     }),
   );
 
-const get = (path: string, token?: string) =>
-  makeRequest("GET", path, { token });
+const get = (path: string, sessionCookie?: string) =>
+  makeRequest("GET", path, { sessionCookie });
 
-const post = (path: string, token?: string, body?: unknown) =>
-  makeRequest("POST", path, { token, body });
+const post = (path: string, sessionCookie?: string, body?: unknown) =>
+  makeRequest("POST", path, { sessionCookie, body });
 
-const del = (path: string, token?: string) =>
-  makeRequest("DELETE", path, { token });
+const del = (path: string, sessionCookie?: string) =>
+  makeRequest("DELETE", path, { sessionCookie });
 
 describe("POST /vault", () => {
   dbTransaction();
 
   it("deve armazenar um item e retornar 201 com cuid", async () => {
     const [user] = await new UserFactory().create();
-    const token = await authHelper.getToken(user!);
+    const sessionCookie = await authHelper.getSessionCookie(user!);
 
-    const res = await post("/vault", token, vaultPayload());
+    const res = await post("/vault", sessionCookie, vaultPayload());
     const data = await res.json();
 
     expect(res.status).toBe(201);
@@ -57,23 +58,54 @@ describe("POST /vault", () => {
     expect(typeof data.cuid).toBe("string");
   });
 
-  it("deve retornar 401 sem token", async () => {
+  it("deve retornar 401 sem sessão", async () => {
     const res = await post("/vault", undefined, vaultPayload());
 
     expect(res.status).toBe(401);
   });
 
-  it("deve retornar 401 com token inválido", async () => {
-    const res = await post("/vault", "invalid-token", vaultPayload());
+  it("deve retornar 401 com sessão inválida", async () => {
+    const res = await post("/vault", "lock_room_session=invalid", vaultPayload());
 
     expect(res.status).toBe(401);
   });
 
+  it("deve invalidar sessão ao mudar subnet", async () => {
+    const [user] = await new UserFactory().create();
+    const sessionCookie = await authHelper.getSessionCookie(user!, {
+      ip: "203.0.113.10",
+    });
+
+    const changedSubnet = await makeRequest("POST", "/vault", {
+      sessionCookie,
+      body: vaultPayload(),
+      ip: "198.51.100.10",
+    });
+    expect(changedSubnet.status).toBe(401);
+
+    const reusedCookie = await post("/vault", sessionCookie, vaultPayload());
+    expect(reusedCookie.status).toBe(401);
+  });
+
+  it("deve invalidar sessão ao mudar user-agent", async () => {
+    const [user] = await new UserFactory().create();
+    const sessionCookie = await authHelper.getSessionCookie(user!, {
+      userAgent: "agent-a/1.0",
+    });
+
+    const changedUserAgent = await makeRequest("POST", "/vault", {
+      sessionCookie,
+      body: vaultPayload(),
+      userAgent: "agent-b/1.0",
+    });
+    expect(changedUserAgent.status).toBe(401);
+  });
+
   it("deve retornar 422 com body inválido", async () => {
     const [user] = await new UserFactory().create();
-    const token = await authHelper.getToken(user!);
+    const sessionCookie = await authHelper.getSessionCookie(user!);
 
-    const res = await post("/vault", token, {
+    const res = await post("/vault", sessionCookie, {
       encryptedHeader: "only-one-field",
     });
     const data = await res.json();
@@ -88,9 +120,9 @@ describe("GET /vault", () => {
 
   it("deve retornar lista vazia quando não há itens", async () => {
     const [user] = await new UserFactory().create();
-    const token = await authHelper.getToken(user!);
+    const sessionCookie = await authHelper.getSessionCookie(user!);
 
-    const res = await get("/vault", token);
+    const res = await get("/vault", sessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -99,14 +131,14 @@ describe("GET /vault", () => {
 
   it("deve retornar apenas os itens do usuário autenticado", async () => {
     const [user] = await new UserFactory().create();
-    const token = await authHelper.getToken(user!);
+    const sessionCookie = await authHelper.getSessionCookie(user!);
 
     await new VaultFactory().setCount(2).create(user!.cuid);
 
     const [otherUser] = await new UserFactory().create();
     await new VaultFactory().create(otherUser!.cuid);
 
-    const res = await get("/vault", token);
+    const res = await get("/vault", sessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -117,7 +149,7 @@ describe("GET /vault", () => {
     expect(data[0]).toHaveProperty("createdAt");
   });
 
-  it("deve retornar 401 sem token", async () => {
+  it("deve retornar 401 sem sessão", async () => {
     const res = await get("/vault");
 
     expect(res.status).toBe(401);
@@ -127,18 +159,18 @@ describe("GET /vault", () => {
 describe("GET /vault/:id", () => {
   dbTransaction();
 
-  let token: string;
+  let sessionCookie: string;
   let cuid: string;
 
   beforeEach(async () => {
     const [user] = await new UserFactory().create();
-    token = await authHelper.getToken(user!);
+    sessionCookie = await authHelper.getSessionCookie(user!);
     const [item] = await new VaultFactory().create(user!.cuid);
     cuid = item!.cuid;
   });
 
   it("deve retornar o item com dados descriptografados", async () => {
-    const res = await get(`/vault/${cuid}`, token);
+    const res = await get(`/vault/${cuid}`, sessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -149,7 +181,7 @@ describe("GET /vault/:id", () => {
     expect(data).toHaveProperty("createdAt");
   });
 
-  it("deve retornar 401 sem token", async () => {
+  it("deve retornar 401 sem sessão", async () => {
     const res = await get(`/vault/${cuid}`);
 
     expect(res.status).toBe(401);
@@ -157,9 +189,9 @@ describe("GET /vault/:id", () => {
 
   it("deve retornar 403 ao acessar item de outro usuário", async () => {
     const [otherUser] = await new UserFactory().create();
-    const otherToken = await authHelper.getToken(otherUser!);
+    const otherSessionCookie = await authHelper.getSessionCookie(otherUser!);
 
-    const res = await get(`/vault/${cuid}`, otherToken);
+    const res = await get(`/vault/${cuid}`, otherSessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(403);
@@ -167,7 +199,7 @@ describe("GET /vault/:id", () => {
   });
 
   it("deve retornar 404 para item inexistente", async () => {
-    const res = await get(`/vault/${createId()}`, token);
+    const res = await get(`/vault/${createId()}`, sessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(404);
@@ -175,7 +207,7 @@ describe("GET /vault/:id", () => {
   });
 
   it("deve retornar 422 para id com formato inválido", async () => {
-    const res = await get("/vault/not-a-valid-id", token);
+    const res = await get("/vault/not-a-valid-id", sessionCookie);
 
     expect(res.status).toBe(422);
   });
@@ -184,23 +216,23 @@ describe("GET /vault/:id", () => {
 describe("DELETE /vault/:id", () => {
   dbTransaction();
 
-  let token: string;
+  let sessionCookie: string;
   let cuid: string;
 
   beforeEach(async () => {
     const [user] = await new UserFactory().create();
-    token = await authHelper.getToken(user!);
+    sessionCookie = await authHelper.getSessionCookie(user!);
     const [item] = await new VaultFactory().create(user!.cuid);
     cuid = item!.cuid;
   });
 
   it("deve deletar o item e retornar 204", async () => {
-    const res = await del(`/vault/${cuid}`, token);
+    const res = await del(`/vault/${cuid}`, sessionCookie);
 
     expect(res.status).toBe(204);
   });
 
-  it("deve retornar 401 sem token", async () => {
+  it("deve retornar 401 sem sessão", async () => {
     const res = await del(`/vault/${cuid}`);
 
     expect(res.status).toBe(401);
@@ -208,9 +240,9 @@ describe("DELETE /vault/:id", () => {
 
   it("deve retornar 404 ao deletar item de outro usuário", async () => {
     const [otherUser] = await new UserFactory().create();
-    const otherToken = await authHelper.getToken(otherUser!);
+    const otherSessionCookie = await authHelper.getSessionCookie(otherUser!);
 
-    const res = await del(`/vault/${cuid}`, otherToken);
+    const res = await del(`/vault/${cuid}`, otherSessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(404);
@@ -218,7 +250,7 @@ describe("DELETE /vault/:id", () => {
   });
 
   it("deve retornar 404 para item inexistente", async () => {
-    const res = await del(`/vault/${createId()}`, token);
+    const res = await del(`/vault/${createId()}`, sessionCookie);
     const data = await res.json();
 
     expect(res.status).toBe(404);

@@ -46,6 +46,16 @@ export class UserFactory {
       name: faker.person.fullName(),
       email: faker.internet.email(),
       password: faker.internet.password({ length: 12 }),
+      encryptedMasterKey: Buffer.from(faker.string.alphanumeric(48)).toString(
+        "base64",
+      ),
+      masterKeyIv: Buffer.from(faker.string.alphanumeric(12)).toString("base64"),
+      masterKeyTag: Buffer.from(faker.string.alphanumeric(16)).toString(
+        "base64",
+      ),
+      masterKeySalt: Buffer.from(faker.string.alphanumeric(16)).toString(
+        "base64",
+      ),
     };
   }
 

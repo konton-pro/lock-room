@@ -30,9 +30,12 @@ Required variables:
 
 ```env
 DATABASE_URL=
-JWT_SECRET=
-SERVER_PORT=
-CRYPTO_SECRET=
+PORT=
+SERVER_MASTER_KEY=
+SESSION_COOKIE_NAME=
+SESSION_TTL_DAYS=
+SESSION_IPV4_SUBNET_BITS=
+SESSION_IPV6_SUBNET_BITS=
 ```
 
 ## Running locally
@@ -42,9 +45,9 @@ bun install
 bun run dev
 ```
 
-The API starts at `http://localhost:<SERVER_PORT>`.
+The API starts at `http://localhost:<PORT>`.
 
-Interactive docs available at `http://localhost:<SERVER_PORT>/swagger`.
+Interactive docs available at `http://localhost:<PORT>/docs`.
 
 ## Scripts
 
@@ -66,8 +69,8 @@ src/
     cors.config.ts
     crypto.config.ts
     database.config.ts
-    jwt.config.ts
     logger.config.ts
+    session.config.ts
     server.config.ts
   database/
     connection.ts       # pg Pool
@@ -77,7 +80,7 @@ src/
   exceptions/           # typed exceptions (e.g. NotFoundException)
   plugins/              # Elysia plugins organized by category
     auth/
-      jwt/              # JWT plugin
+      session/          # Session plugin + session guard
     core/
       error-handler/    # standardized onError handler
     crypto/
