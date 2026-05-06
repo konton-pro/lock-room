@@ -1,7 +1,10 @@
 import { Elysia } from "elysia";
 import { UnauthorizedException } from "@exceptions/unauthorized.exception";
 import { authRepository } from "@modules/auth/auth.repository";
-import { sessionHelpers } from "@plugins/auth/session/session.helpers";
+import { buildSessionCookie, extractSessionId } from "@plugins/auth/session/session.cookie";
+import { hashSessionId, hashUserAgent } from "@plugins/auth/session/session.hash";
+import { resolveSubnet } from "@plugins/auth/session/session.network";
+import { getSessionExpiresAt } from "@plugins/auth/session/session.time";
 
 const MISSING_SESSION = "Missing session";
 const INVALID_SESSION = "Invalid session";
@@ -9,11 +12,11 @@ const INVALID_SESSION = "Invalid session";
 export const sessionGuard = new Elysia({ name: "plugin:session-guard" })
   .derive({ as: "scoped" }, async ({ request, set }) => {
     const cookieHeader = request.headers.get("cookie");
-    const sessionId = sessionHelpers.extractSessionId(cookieHeader);
+    const sessionId = extractSessionId(cookieHeader);
 
     if (!sessionId) throw new UnauthorizedException(MISSING_SESSION);
 
-    const sessionIdHash = sessionHelpers.hashSessionId(sessionId);
+    const sessionIdHash = hashSessionId(sessionId);
     const session = await authRepository.findActiveSessionByHash(
       sessionIdHash,
       new Date(),
@@ -21,8 +24,8 @@ export const sessionGuard = new Elysia({ name: "plugin:session-guard" })
 
     if (!session) throw new UnauthorizedException(INVALID_SESSION);
 
-    const requestIpSubnet = sessionHelpers.resolveSubnet(request);
-    const requestUserAgentHash = sessionHelpers.hashUserAgent(
+    const requestIpSubnet = resolveSubnet(request);
+    const requestUserAgentHash = hashUserAgent(
       request.headers.get("user-agent"),
     );
 
@@ -41,12 +44,9 @@ export const sessionGuard = new Elysia({ name: "plugin:session-guard" })
       throw new UnauthorizedException(INVALID_SESSION);
     }
 
-    const expiresAt = sessionHelpers.getExpiresAt();
+    const expiresAt = getSessionExpiresAt();
     await authRepository.touchSessionByHash(sessionIdHash, expiresAt);
-    set.headers["set-cookie"] = sessionHelpers.buildSessionCookie(
-      sessionId,
-      expiresAt,
-    );
+    set.headers["set-cookie"] = buildSessionCookie(sessionId, expiresAt);
 
     return {
       userId: user.cuid,

@@ -1,6 +1,16 @@
 import { Elysia } from "elysia";
 import { sessionGuard } from "@plugins/auth/session/session.plugin";
-import { sessionHelpers } from "@plugins/auth/session/session.helpers";
+import {
+  buildClearSessionCookie,
+  buildSessionCookie,
+} from "@plugins/auth/session/session.cookie";
+import {
+  generateSessionId,
+  hashSessionId,
+  hashUserAgent,
+} from "@plugins/auth/session/session.hash";
+import { resolveSubnet } from "@plugins/auth/session/session.network";
+import { getSessionExpiresAt } from "@plugins/auth/session/session.time";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { rateLimitAuthPlugin } from "@plugins/infra/rate-limit/rate-limit-auth.plugin";
 import { authService } from "@modules/auth/auth.service";
@@ -50,11 +60,11 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
 
       await authRepository.deleteSessionsByUserCuid(userCuid);
 
-      const sessionId = sessionHelpers.generateSessionId();
-      const sessionIdHash = sessionHelpers.hashSessionId(sessionId);
-      const expiresAt = sessionHelpers.getExpiresAt();
-      const requestIpSubnet = sessionHelpers.resolveSubnet(request);
-      const requestUserAgentHash = sessionHelpers.hashUserAgent(
+      const sessionId = generateSessionId();
+      const sessionIdHash = hashSessionId(sessionId);
+      const expiresAt = getSessionExpiresAt();
+      const requestIpSubnet = resolveSubnet(request);
+      const requestUserAgentHash = hashUserAgent(
         request.headers.get("user-agent"),
       );
 
@@ -66,10 +76,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
         expiresAt,
       });
 
-      set.headers["set-cookie"] = sessionHelpers.buildSessionCookie(
-        sessionId,
-        expiresAt,
-      );
+      set.headers["set-cookie"] = buildSessionCookie(sessionId, expiresAt);
 
       return { name, ...masterKeyData };
     },
@@ -80,7 +87,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     "/logout",
     async ({ sessionIdHash, set }) => {
       await authRepository.deleteSessionByHash(sessionIdHash);
-      set.headers["set-cookie"] = sessionHelpers.buildClearSessionCookie();
+      set.headers["set-cookie"] = buildClearSessionCookie();
       set.status = HTTP_STATUS.NO_CONTENT;
     },
     logoutDocs,
