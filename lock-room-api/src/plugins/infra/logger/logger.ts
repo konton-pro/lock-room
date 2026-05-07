@@ -29,6 +29,12 @@ if (loggerConfig.pretty) {
     level: loggerConfig.level,
     options: { colorize: true, translateTime: "SYS:standard", ignore: "pid" },
   });
+} else {
+  targets.push({
+    target: "pino/file",
+    level: loggerConfig.level,
+    options: { destination: 1 },
+  });
 }
 
 export const logger = pino(
