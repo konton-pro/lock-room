@@ -42,7 +42,6 @@ export const useLoginForm = () => {
         email: value.email.toLowerCase(),
         password: value.password,
       })
-      authStore.setToken(data.token)
       authStore.setName(data.name)
       const masterKey = await decryptMasterKey(data, value.password)
       vaultKeyStore.setKey(masterKey)

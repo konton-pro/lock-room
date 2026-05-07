@@ -40,7 +40,8 @@ export const sanitizeHeaders = (
   const sanitized: Record<string, string> = {};
 
   headers.forEach((value, key) => {
-    sanitized[key] = key === "authorization" ? "[redacted]" : value;
+    sanitized[key] =
+      key === "authorization" || key === "cookie" ? "[redacted]" : value;
   });
 
   return sanitized;

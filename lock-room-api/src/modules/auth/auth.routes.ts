@@ -1,13 +1,25 @@
 import { Elysia } from "elysia";
-import { jwtPlugin } from "@plugins/auth/jwt/jwt.plugin";
+import { sessionGuard } from "@plugins/auth/session/session.plugin";
+import {
+  buildClearSessionCookie,
+  buildSessionCookie,
+} from "@plugins/auth/session/session.cookie";
+import {
+  generateSessionId,
+  hashSessionId,
+  hashUserAgent,
+} from "@plugins/auth/session/session.hash";
+import { resolveSubnet } from "@plugins/auth/session/session.network";
+import { getSessionExpiresAt } from "@plugins/auth/session/session.time";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { rateLimitAuthPlugin } from "@plugins/infra/rate-limit/rate-limit-auth.plugin";
 import { authService } from "@modules/auth/auth.service";
+import { authRepository } from "@modules/auth/auth.repository";
 import { loginSchema, registerSchema } from "@modules/auth/auth.schema";
-import { loginDocs, registerDocs } from "@modules/auth/auth.docs";
+import { loginDocs, logoutDocs, registerDocs } from "@modules/auth/auth.docs";
+import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const authRoutes = new Elysia({ prefix: "/auth" })
-  .use(jwtPlugin)
   .use(serverCryptoPlugin)
   .use(rateLimitAuthPlugin)
   .post(
@@ -39,14 +51,44 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
   )
   .post(
     "/login",
-    async ({ body, jwt }) => {
+    async ({ body, request, set }) => {
       const data = loginSchema.body.parse(body);
-      const { name, jwtPayload, masterKeyData } = await authService.login(
+      const { userCuid, name, masterKeyData } = await authService.login(
         data.email,
         data.password,
       );
-      const token = await jwt.sign(jwtPayload);
-      return { token, name, ...masterKeyData };
+
+      await authRepository.deleteSessionsByUserCuid(userCuid);
+
+      const sessionId = generateSessionId();
+      const sessionIdHash = hashSessionId(sessionId);
+      const expiresAt = getSessionExpiresAt();
+      const requestIpSubnet = resolveSubnet(request);
+      const requestUserAgentHash = hashUserAgent(
+        request.headers.get("user-agent"),
+      );
+
+      await authRepository.createSession({
+        userCuid,
+        sessionIdHash,
+        ipSubnet: requestIpSubnet,
+        userAgentHash: requestUserAgentHash,
+        expiresAt,
+      });
+
+      set.headers["set-cookie"] = buildSessionCookie(sessionId, expiresAt);
+
+      return { name, ...masterKeyData };
     },
     loginDocs,
+  )
+  .use(sessionGuard)
+  .post(
+    "/logout",
+    async ({ sessionIdHash, set }) => {
+      await authRepository.deleteSessionByHash(sessionIdHash);
+      set.headers["set-cookie"] = buildClearSessionCookie();
+      set.status = HTTP_STATUS.NO_CONTENT;
+    },
+    logoutDocs,
   );

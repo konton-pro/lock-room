@@ -1,4 +1,4 @@
-import { login, register } from '@/services/auth'
+import { login, logout, register } from '@/services/auth'
 import type { LoginPayload, RegisterPayload } from '@/types/auth'
 
 export const authMutations = {
@@ -7,5 +7,8 @@ export const authMutations = {
   }),
   register: () => ({
     mutationFn: (payload: RegisterPayload) => register(payload),
+  }),
+  logout: () => ({
+    mutationFn: () => logout(),
   }),
 }

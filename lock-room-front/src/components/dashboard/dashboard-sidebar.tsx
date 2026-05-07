@@ -41,12 +41,8 @@ export const DashboardSidebar = () => {
       >
         {operatorName}
       </p>
-      <p className="m-0 label-tag flex items-center gap-2 mt-1" style={{ color: 'var(--text-muted)' }}>
-        <span
-          className="status-dot"
-          style={{ background: '#4ade80', width: '6px', height: '6px', flexShrink: 0 }}
-        />
-        SESSION:ACTIVE
+      <p className="m-0 label-tag mt-1" style={{ color: 'var(--text-muted)' }}>
+        ENTRIES_MODULE
       </p>
     </div>
 
@@ -78,14 +74,7 @@ export const DashboardSidebar = () => {
 
     <div style={{ flex: 1 }} />
 
-    <div
-      className="flex items-center gap-2"
-      style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border)' }}
-    >
-      <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
-        SYSTEM_STATUS
-      </span>
-    </div>
+    <div style={{ height: '1rem' }} />
   </aside>
   )
 }

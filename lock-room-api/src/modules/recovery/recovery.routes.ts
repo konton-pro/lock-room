@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { authGuard } from "@plugins/auth/jwt/jwt.plugin";
+import { sessionGuard } from "@plugins/auth/session/session.plugin";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { rateLimitAuthPlugin } from "@plugins/infra/rate-limit/rate-limit-auth.plugin";
 import { recoveryService } from "@modules/recovery/recovery.service";
@@ -17,7 +17,7 @@ import {
 import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 const authenticatedRoutes = new Elysia()
-  .use(authGuard)
+  .use(sessionGuard)
   .use(serverCryptoPlugin)
   .post(
     "/",

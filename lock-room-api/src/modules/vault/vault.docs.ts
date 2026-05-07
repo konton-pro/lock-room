@@ -1,4 +1,4 @@
-const security = [{ bearerAuth: [] }];
+const security = [{ cookieAuth: [] }];
 
 export const storeVaultDocs = {
   detail: {
@@ -54,7 +54,7 @@ export const storeVaultDocs = {
           },
         },
       },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
       422: { description: "Validation error" },
     },
   },
@@ -101,7 +101,7 @@ export const retrieveVaultDocs = {
           },
         },
       },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
       403: { description: "Access denied" },
       404: { description: "Item not found" },
     },
@@ -149,7 +149,7 @@ export const listVaultDocs = {
           },
         },
       },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
     },
   },
 };
@@ -163,7 +163,7 @@ export const deleteVaultDocs = {
     security,
     responses: {
       204: { description: "Item deleted" },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
       403: { description: "Access denied" },
       404: { description: "Item not found" },
     },

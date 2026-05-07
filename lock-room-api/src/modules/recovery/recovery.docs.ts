@@ -1,4 +1,4 @@
-const security = [{ bearerAuth: [] }];
+const security = [{ cookieAuth: [] }];
 
 const base64Field = {
   type: "string" as const,
@@ -57,7 +57,7 @@ export const storeRecoveryDocs = {
           },
         },
       },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
       422: { description: "Validation error" },
     },
   },
@@ -93,7 +93,7 @@ export const statusRecoveryDocs = {
           },
         },
       },
-      401: { description: "Missing or invalid token" },
+      401: { description: "Missing or invalid session" },
     },
   },
 };

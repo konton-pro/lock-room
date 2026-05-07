@@ -1,10 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { RegisterForm } from '@/components/register/register-form'
-import { authStore } from '@/stores/auth-store'
+import { hasActiveSession } from '@/lib/session'
 
 export const Route = createFileRoute('/register')({
-  beforeLoad: () => {
-    if (authStore.isAuthenticated()) throw redirect({ to: '/dashboard' })
+  beforeLoad: async ({ context }) => {
+    const authenticated = await hasActiveSession(context.queryClient)
+    if (authenticated) throw redirect({ to: '/dashboard' })
   },
   component: RegisterPage,
 })
