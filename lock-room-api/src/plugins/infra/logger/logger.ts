@@ -29,7 +29,9 @@ if (loggerConfig.pretty) {
     level: loggerConfig.level,
     options: { colorize: true, translateTime: "SYS:standard", ignore: "pid" },
   });
-} else {
+}
+
+if (!loggerConfig.pretty) {
   targets.push({
     target: "pino/file",
     level: loggerConfig.level,
