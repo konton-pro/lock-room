@@ -1,81 +1,19 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { vaultQueries } from '@/queries/vault'
-import { useOperatorName } from '@/hooks/use-operator-name'
-import { useLogout } from '@/hooks/use-logout'
 import { DashboardSidebar } from './dashboard-sidebar'
-import { VaultCard } from './vault-card'
+import { DashboardTopBar } from './dashboard-topbar'
+import { DashboardVaultContent } from './dashboard-vault-content'
+import { DashboardFooterMetrics } from './dashboard-footer-metrics'
 import { NewEntryModal } from './new-entry-modal'
-
-const TopBar = () => {
-  const operatorName = useOperatorName()
-  const logout = useLogout()
-
-  return (
-    <div
-      className="flex items-center justify-between px-5 md:px-8"
-      style={{
-        borderBottom: '1px solid var(--border)',
-        paddingTop: '0.875rem',
-        paddingBottom: '0.875rem',
-        background: 'var(--bg)',
-        flexShrink: 0,
-      }}
-    >
-      <div className="flex flex-col md:hidden">
-        <span
-          className="label-tag font-bold"
-          style={{ color: 'var(--text-primary)', fontSize: '0.85rem', letterSpacing: '0.1em' }}
-        >
-          VAULT_01
-        </span>
-        <span className="label-tag" style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>
-          {operatorName}
-        </span>
-      </div>
-
-      <nav className="hidden md:flex items-center gap-8">
-        <span
-          className="label-tag"
-          style={{
-            color: 'var(--text-primary)',
-            borderBottom: '1px solid var(--text-primary)',
-            paddingBottom: '3px',
-          }}
-        >
-          DASHBOARD
-        </span>
-      </nav>
-
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          className="label-tag transition-colors"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            fontSize: '0.75rem',
-            padding: '0.25rem',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-        >
-          ⚙
-        </button>
-        <button type="button" className="btn-ghost text-xs" onClick={logout}>
-          [ LOGOUT ]
-        </button>
-      </div>
-    </div>
-  )
-}
+import { getLatestCreatedAt } from './dashboard-utils'
 
 export const DashboardPage = () => {
   const { data: items = [], isLoading } = useQuery(vaultQueries.list())
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false)
-  const openNewEntry = () => setIsNewEntryOpen(true)
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+
+  const latestCreatedAt = useMemo(() => getLatestCreatedAt(items), [items])
 
   return (
     <div className="flex" style={{ minHeight: '100vh' }}>
@@ -83,7 +21,7 @@ export const DashboardPage = () => {
       <DashboardSidebar />
 
       <div className="flex flex-col flex-1" style={{ overflow: 'hidden' }}>
-        <TopBar />
+        <DashboardTopBar />
 
         <div className="flex-1 p-4 md:p-8" style={{ overflowY: 'auto' }}>
           <div className="flex items-start justify-between gap-4 mb-6 fade-in">
@@ -101,14 +39,14 @@ export const DashboardPage = () => {
                 ACTIVE_VAULT
               </h1>
               <p className="label-tag m-0 mt-2" style={{ color: 'var(--text-secondary)' }}>
-                SUB_PROTOCOL: 0X882A / STATUS: SECURE
+                TOTAL_ENTRIES: {String(items.length).padStart(2, '0')}
               </p>
             </div>
             <button
               type="button"
               className="btn-primary text-xs"
               style={{ flexShrink: 0 }}
-              onClick={openNewEntry}
+              onClick={() => setIsNewEntryOpen(true)}
             >
               [ NEW_ENTRY ]
             </button>
@@ -116,52 +54,17 @@ export const DashboardPage = () => {
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 2rem' }} />
 
-          {isLoading ? (
-            <div className="flex items-center gap-3 fade-in">
-              <span className="cursor-blink" />
-              <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
-                LOADING_VAULT_ENTRIES
-              </span>
-            </div>
-          ) : (
-            <div
-              className="fade-up"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1rem',
-              }}
-            >
-              {items.map((item) => (
-                <VaultCard key={item.cuid} item={item} />
-              ))}
-            </div>
-          )}
+          <DashboardVaultContent
+            items={items}
+            isLoading={isLoading}
+            selectedCardId={selectedCardId}
+            onOpenCard={setSelectedCardId}
+            onCloseCard={() => setSelectedCardId(null)}
+          />
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '2rem 0 1rem' }} />
 
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-4 flex-wrap">
-              <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
-                TOTAL_KEYS: {String(items.length).padStart(2, '0')}
-              </span>
-              <span className="label-tag hidden md:inline" style={{ color: 'var(--text-muted)' }}>
-                REDUNDANCY: 3X
-              </span>
-              <span className="label-tag hidden md:inline" style={{ color: 'var(--text-muted)' }}>
-                ENCRYPTION: AES-4096-XTS
-              </span>
-            </div>
-            <div className="hidden md:flex items-center gap-2">
-              <span
-                className="status-dot"
-                style={{ background: '#4ade80', width: '6px', height: '6px' }}
-              />
-              <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
-                SYSTEM_LINK: ESTABLISHED
-              </span>
-            </div>
-          </div>
+          <DashboardFooterMetrics totalItems={items.length} latestCreatedAt={latestCreatedAt} />
         </div>
       </div>
     </div>
