@@ -16,6 +16,8 @@ services:
       - SESSION_IPV6_SUBNET_BITS=${SESSION_IPV6_SUBNET_BITS:-64}
       - MAX_REQUESTS_PER_MINUTE=${MAX_REQUESTS_PER_MINUTE:-100}
       - MAX_AUTH_REQUESTS_PER_MINUTE=${MAX_AUTH_REQUESTS_PER_MINUTE:-5}
+      - LOG_PRETTY=${LOG_PRETTY:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
       - NODE_ENV=production
     networks:
       - coolify
