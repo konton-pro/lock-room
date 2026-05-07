@@ -4,7 +4,6 @@ export type LoginPayload = {
 }
 
 export type LoginResponse = {
-  token: string
   name: string
   encryptedMasterKey: string
   masterKeyIv: string

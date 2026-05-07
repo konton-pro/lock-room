@@ -1,10 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { RecoverForm } from '@/components/recover/recover-form'
-import { authStore } from '@/stores/auth-store'
+import { hasActiveSession } from '@/lib/session'
 
 export const Route = createFileRoute('/recover')({
-  beforeLoad: () => {
-    if (authStore.isAuthenticated()) throw redirect({ to: '/dashboard' })
+  beforeLoad: async ({ context }) => {
+    const authenticated = await hasActiveSession(context.queryClient)
+    if (authenticated) throw redirect({ to: '/dashboard' })
   },
   component: RecoverPage,
 })

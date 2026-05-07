@@ -1,4 +1,4 @@
-import { http } from '@/lib/http'
+import { http, protectedRouteOptions } from '@/lib/http'
 import type {
   StoreRecoveryPayload,
   StoreRecoveryResponse,
@@ -9,10 +9,10 @@ import type {
 } from '@/types/recovery'
 
 export const storeRecoveryKey = (payload: StoreRecoveryPayload): Promise<StoreRecoveryResponse> =>
-  http.post('recovery', { json: payload }).json<StoreRecoveryResponse>()
+  http.post('recovery', { ...protectedRouteOptions(), json: payload }).json<StoreRecoveryResponse>()
 
 export const getRecoveryStatus = (): Promise<RecoveryStatusResponse> =>
-  http.get('recovery/status').json<RecoveryStatusResponse>()
+  http.get('recovery/status', protectedRouteOptions()).json<RecoveryStatusResponse>()
 
 export const verifyRecoveryKey = (payload: VerifyRecoveryPayload): Promise<VerifyRecoveryResponse> =>
   http.post('recovery/verify', { json: payload }).json<VerifyRecoveryResponse>()
