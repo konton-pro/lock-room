@@ -1,14 +1,14 @@
 FROM node:22-alpine AS base
-RUN npm install -g pnpm@11.1.2
+RUN npm install -g pnpm@11.7.0
 WORKDIR /app
 
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile --dangerously-allow-all-builds
 
 FROM base AS build
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile --dangerously-allow-all-builds
 COPY . .
 ARG VITE_API_URL
 ARG VITE_APP_TITLE="Lock Room"

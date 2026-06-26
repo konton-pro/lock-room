@@ -1,7 +1,7 @@
 {
   "name": "lock-room-front",
   "private": true,
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.7.0",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
@@ -58,11 +58,5 @@
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
   }
 }
