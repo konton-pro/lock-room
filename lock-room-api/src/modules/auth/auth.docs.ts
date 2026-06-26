@@ -9,17 +9,45 @@ export const registerDocs = {
         "application/json": {
           schema: {
             type: "object" as const,
-            required: ["name", "email", "password"],
+            required: [
+              "name",
+              "email",
+              "password",
+              "encryptedMasterKey",
+              "masterKeyIv",
+              "masterKeyTag",
+              "masterKeySalt",
+              "recoveryEncryptedPayload",
+              "recoveryIv",
+              "recoveryTag",
+              "recoveryKeyHash",
+            ],
             properties: {
               name: { type: "string" as const, minLength: 1 },
               email: { type: "string" as const, format: "email" },
               password: { type: "string" as const, minLength: 8 },
+              encryptedMasterKey: { type: "string" as const },
+              masterKeyIv: { type: "string" as const },
+              masterKeyTag: { type: "string" as const },
+              masterKeySalt: { type: "string" as const },
+              recoveryEncryptedPayload: { type: "string" as const },
+              recoveryIv: { type: "string" as const },
+              recoveryTag: { type: "string" as const },
+              recoveryKeyHash: { type: "string" as const },
             },
           },
           example: {
             name: "John Doe",
             email: "user@example.com",
             password: "strongpassword123",
+            encryptedMasterKey: "base64_master_key",
+            masterKeyIv: "base64_iv",
+            masterKeyTag: "base64_tag",
+            masterKeySalt: "base64_salt",
+            recoveryEncryptedPayload: "base64_payload",
+            recoveryIv: "base64_iv",
+            recoveryTag: "base64_tag",
+            recoveryKeyHash: "sha256_hex",
           },
         },
       },
@@ -53,8 +81,8 @@ export const registerDocs = {
 export const loginDocs = {
   detail: {
     tags: ["Auth"],
-    summary: "Login",
-    description: "Authenticate and receive a JWT token",
+    summary: "Login with session",
+    description: "Authenticate and create an HttpOnly session cookie",
     requestBody: {
       required: true,
       content: {
@@ -76,18 +104,25 @@ export const loginDocs = {
     },
     responses: {
       200: {
-        description: "JWT token",
+        description: "Authenticated user data",
         content: {
           "application/json": {
             schema: {
               type: "object" as const,
               properties: {
-                token: { type: "string" as const },
+                name: { type: "string" as const },
+                encryptedMasterKey: { type: "string" as const },
+                masterKeyIv: { type: "string" as const },
+                masterKeyTag: { type: "string" as const },
+                masterKeySalt: { type: "string" as const },
               },
             },
             example: {
-              token:
-                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ejRhOTh4eGF0OTZpd3M5em1icmdqM2EifQ.signature",
+              name: "John Doe",
+              encryptedMasterKey: "base64_master_key",
+              masterKeyIv: "base64_iv",
+              masterKeyTag: "base64_tag",
+              masterKeySalt: "base64_salt",
             },
           },
         },
@@ -95,6 +130,19 @@ export const loginDocs = {
       401: { description: "Invalid credentials" },
       422: { description: "Validation error" },
       429: { description: "Too many requests" },
+    },
+  },
+};
+
+export const logoutDocs = {
+  detail: {
+    tags: ["Auth"],
+    summary: "Logout",
+    description: "Invalidate active session and clear session cookie",
+    security: [{ cookieAuth: [] }],
+    responses: {
+      204: { description: "Logged out" },
+      401: { description: "Missing or invalid session" },
     },
   },
 };

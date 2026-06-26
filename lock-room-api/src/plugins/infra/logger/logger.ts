@@ -31,6 +31,14 @@ if (loggerConfig.pretty) {
   });
 }
 
+if (!loggerConfig.pretty) {
+  targets.push({
+    target: "pino/file",
+    level: loggerConfig.level,
+    options: { destination: 1 },
+  });
+}
+
 export const logger = pino(
   { level: loggerConfig.level },
   pino.transport({ targets }),

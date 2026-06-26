@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { authGuard } from "@plugins/auth/jwt/jwt.plugin";
+import { sessionGuard } from "@plugins/auth/session/session.plugin";
 import { serverCryptoPlugin } from "@plugins/crypto/server-crypto/server-crypto.plugin";
 import { vaultService } from "@modules/vault/vault.service";
 import {
@@ -15,7 +15,7 @@ import {
 import { HTTP_STATUS } from "@plugins/core/error-handler/http-status.constants";
 
 export const vaultRoutes = new Elysia({ prefix: "/vault" })
-  .use(authGuard)
+  .use(sessionGuard)
   .use(serverCryptoPlugin)
   .post(
     "/",

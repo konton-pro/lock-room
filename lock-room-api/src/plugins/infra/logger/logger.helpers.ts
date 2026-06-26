@@ -34,13 +34,28 @@ const isJsonRequest = (request: Request) =>
     "application/json",
   );
 
+const HEADER_ALLOWLIST = new Set([
+  "host",
+  "origin",
+  "referer",
+  "user-agent",
+  "x-forwarded-for",
+  "x-real-ip",
+  "x-forwarded-proto",
+  "content-type",
+  "authorization",
+  "cookie",
+]);
+
 export const sanitizeHeaders = (
   headers: Headers,
 ): Record<string, string> => {
   const sanitized: Record<string, string> = {};
 
   headers.forEach((value, key) => {
-    sanitized[key] = key === "authorization" ? "[redacted]" : value;
+    if (!HEADER_ALLOWLIST.has(key)) return;
+    sanitized[key] =
+      key === "authorization" || key === "cookie" ? "[redacted]" : value;
   });
 
   return sanitized;

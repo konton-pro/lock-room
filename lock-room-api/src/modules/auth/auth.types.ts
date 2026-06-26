@@ -1,8 +1,3 @@
-export type JwtPayload = {
-  sub: string;
-  email: string;
-};
-
 export type MasterKeyData = {
   encryptedMasterKey: string;
   masterKeyIv: string;
@@ -15,4 +10,12 @@ export type RecoveryKeyData = {
   iv: string;
   tag: string;
   recoveryKeyHash: string;
+};
+
+export type SessionInput = {
+  userCuid: string;
+  sessionIdHash: string;
+  ipSubnet: string;
+  userAgentHash: string;
+  expiresAt: Date;
 };

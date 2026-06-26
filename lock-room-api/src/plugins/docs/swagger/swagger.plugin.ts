@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
+import { sessionConfig } from "@configs/session.config";
 
 export const swaggerPlugin = new Elysia({ name: "plugin:swagger" }).use(
   swagger({
@@ -16,10 +17,10 @@ export const swaggerPlugin = new Elysia({ name: "plugin:swagger" }).use(
       ],
       components: {
         securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
+          cookieAuth: {
+            type: "apiKey",
+            in: "cookie",
+            name: sessionConfig.cookieName,
           },
         },
       },

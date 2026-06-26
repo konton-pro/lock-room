@@ -1,24 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { getVaultItem } from '@/services/vault'
-import { vaultKeyStore } from '@/stores/vault-key-store'
-import { decryptVaultField } from '@/lib/crypto/vault-crypto'
 import type { VaultListItem } from '@/services/vault'
+import {
+  createVaultBodyQueryOptions,
+  decryptVaultTitle,
+  isDecryptFailure,
+  DECRYPT_FAILED,
+} from './vault-card-utils'
 
-export const DECRYPT_FAILED = '[DECRYPT_FAILED]'
+const COPY_FEEDBACK_TIMEOUT_MS = 1500
 
-export const createVaultBodyQueryOptions = (item: VaultListItem) => ({
-  queryKey: ['vault', 'body', item.cuid] as const,
-  queryFn: async () => {
-    const masterKey = vaultKeyStore.getKey()
-    if (!masterKey) return DECRYPT_FAILED
-    const full = await getVaultItem(item.cuid)
-    return decryptVaultField(full.encryptedBody, full.clientIv, masterKey)
-      .catch(() => DECRYPT_FAILED)
-  },
-  staleTime: Infinity,
-  retry: false,
-})
+export { createVaultBodyQueryOptions, DECRYPT_FAILED } from './vault-card-utils'
 
 export const resolveVaultBodyForCopy = async ({
   body,
@@ -32,27 +24,24 @@ export const resolveVaultBodyForCopy = async ({
 
 export const useVaultCard = (item: VaultListItem) => {
   const queryClient = useQueryClient()
-  const [revealed, setRevealed] = useState(false)
-  const [copying, setCopying] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copying, setCopying] = useState(false)
+  const [revealed, setRevealed] = useState(false)
   const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const bodyQueryOptions = createVaultBodyQueryOptions(item)
 
   const { data: title = null } = useQuery({
     queryKey: ['vault', 'title', item.cuid],
-    queryFn: () => {
-      const masterKey = vaultKeyStore.getKey()
-      if (!masterKey) return DECRYPT_FAILED
-      return decryptVaultField(item.encryptedHeader, item.clientIv, masterKey)
-        .catch(() => DECRYPT_FAILED)
-    },
+    queryFn: () => decryptVaultTitle(item),
     retry: false,
+    staleTime: Infinity,
   })
 
   const { data: body = null, isFetching: loadingBody } = useQuery({
     ...bodyQueryOptions,
     enabled: revealed,
+    retry: false,
   })
 
   useEffect(() => {
@@ -63,7 +52,7 @@ export const useVaultCard = (item: VaultListItem) => {
     }
   }, [])
 
-  const reveal = () => setRevealed((prev) => !prev)
+  const toggleReveal = () => setRevealed((value) => !value)
 
   const triggerCopiedFeedback = () => {
     if (copiedTimeoutRef.current !== null) {
@@ -74,7 +63,7 @@ export const useVaultCard = (item: VaultListItem) => {
     copiedTimeoutRef.current = setTimeout(() => {
       setCopied(false)
       copiedTimeoutRef.current = null
-    }, 1500)
+    }, COPY_FEEDBACK_TIMEOUT_MS)
   }
 
   const copy = async () => {
@@ -94,10 +83,22 @@ export const useVaultCard = (item: VaultListItem) => {
       await navigator.clipboard.writeText(value)
       triggerCopiedFeedback()
     } catch {
+      // Keep the card state unchanged when copy prerequisites fail.
     } finally {
       setCopying(false)
     }
   }
 
-  return { title, body, revealed, copying, copied, loadingBody, reveal, copy }
+  return {
+    title,
+    body,
+    revealed,
+    copying,
+    copied,
+    loadingBody,
+    isTitleDecryptFailed: isDecryptFailure(title),
+    isBodyDecryptFailed: isDecryptFailure(body),
+    toggleReveal,
+    copy,
+  }
 }

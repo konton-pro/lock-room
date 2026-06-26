@@ -4,7 +4,7 @@ import { UnprocessableEntityException } from "@exceptions/unprocessable-entity.e
 import { authRepository } from "@modules/auth/auth.repository";
 import { recoveryRepository } from "@modules/recovery/recovery.repository";
 import { AUTH_ERRORS } from "@modules/auth/auth.constants";
-import type { JwtPayload, MasterKeyData, RecoveryKeyData } from "@modules/auth/auth.types";
+import type { MasterKeyData, RecoveryKeyData } from "@modules/auth/auth.types";
 import type { ServerCrypto } from "@modules/recovery/recovery.types";
 
 export const authService = {
@@ -42,7 +42,11 @@ export const authService = {
   login: async (
     email: string,
     password: string,
-  ): Promise<{ name: string; jwtPayload: JwtPayload; masterKeyData: MasterKeyData }> => {
+  ): Promise<{
+    userCuid: string;
+    name: string;
+    masterKeyData: MasterKeyData;
+  }> => {
     const user = await authRepository.findByEmail(email);
 
     if (!user) throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
@@ -61,8 +65,8 @@ export const authService = {
       throw new UnprocessableEntityException(AUTH_ERRORS.MISSING_MASTER_KEY);
 
     return {
+      userCuid: user.cuid,
       name: user.name,
-      jwtPayload: { sub: user.cuid, email: user.email },
       masterKeyData: {
         encryptedMasterKey: user.encryptedMasterKey,
         masterKeyIv: user.masterKeyIv,
