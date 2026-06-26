@@ -23,6 +23,7 @@ export const createVaultBodyQueryOptions = (item: VaultListItem) => ({
       .catch(() => DECRYPT_FAILED)
   },
   staleTime: Infinity,
+  retry: false,
 })
 
 export const isDecryptFailure = (value: string | null): boolean =>

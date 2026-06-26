@@ -10,6 +10,10 @@ vi.mock('@/hooks/use-vault-card', () => ({
   useVaultCard: vi.fn(),
 }))
 
+vi.mock('./vault-detail-modal', () => ({
+  VaultDetailModal: () => null,
+}))
+
 const useVaultCardMock = vi.mocked(useVaultCard)
 
 const listItem: VaultListItem = {
@@ -21,11 +25,15 @@ const listItem: VaultListItem = {
 
 describe('VaultCard hidden copy UI', () => {
   const copyMock = vi.fn()
-  const revealMock = vi.fn()
+  const toggleRevealMock = vi.fn()
+  const onOpenDetailsMock = vi.fn()
+  const onCloseDetailsMock = vi.fn()
 
   beforeEach(() => {
     copyMock.mockReset()
-    revealMock.mockReset()
+    toggleRevealMock.mockReset()
+    onOpenDetailsMock.mockReset()
+    onCloseDetailsMock.mockReset()
 
     useVaultCardMock.mockReturnValue({
       title: 'ACHE-JA-SUPERADMIN',
@@ -34,7 +42,9 @@ describe('VaultCard hidden copy UI', () => {
       copying: false,
       copied: false,
       loadingBody: false,
-      reveal: revealMock,
+      isTitleDecryptFailed: false,
+      isBodyDecryptFailed: false,
+      toggleReveal: toggleRevealMock,
       copy: copyMock,
     })
   })
@@ -45,17 +55,23 @@ describe('VaultCard hidden copy UI', () => {
   })
 
   it('keeps copy available while the card stays hidden', () => {
-    render(<VaultCard item={listItem} />)
+    render(
+      <VaultCard
+        item={listItem}
+        isSelected={false}
+        onOpenDetails={onOpenDetailsMock}
+        onCloseDetails={onCloseDetailsMock}
+      />,
+    )
 
-    expect(screen.getByText('[ LOCKED ]')).toBeTruthy()
-    expect(screen.getByRole('button', { name: '[VIEW]' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: '[CPY]' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Reveal content' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Copy content' })).toBeTruthy()
     expect(screen.queryByText('body-secret')).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: '[CPY]' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Copy content' }))
 
     expect(copyMock).toHaveBeenCalledTimes(1)
-    expect(revealMock).not.toHaveBeenCalled()
+    expect(toggleRevealMock).not.toHaveBeenCalled()
     expect(screen.queryByText('body-secret')).toBeNull()
   })
 
@@ -67,13 +83,23 @@ describe('VaultCard hidden copy UI', () => {
       copying: true,
       copied: false,
       loadingBody: false,
-      reveal: revealMock,
+      isTitleDecryptFailed: false,
+      isBodyDecryptFailed: false,
+      toggleReveal: toggleRevealMock,
       copy: copyMock,
     })
 
-    render(<VaultCard item={listItem} />)
+    render(
+      <VaultCard
+        item={listItem}
+        isSelected={false}
+        onOpenDetails={onOpenDetailsMock}
+        onCloseDetails={onCloseDetailsMock}
+      />,
+    )
 
-    expect(screen.getByRole('button', { name: '[...]' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Copy content' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByText('COPYING')).toBeTruthy()
     expect(screen.queryByText('body-secret')).toBeNull()
   })
 
@@ -85,14 +111,22 @@ describe('VaultCard hidden copy UI', () => {
       copying: false,
       copied: true,
       loadingBody: false,
-      reveal: revealMock,
+      isTitleDecryptFailed: false,
+      isBodyDecryptFailed: false,
+      toggleReveal: toggleRevealMock,
       copy: copyMock,
     })
 
-    render(<VaultCard item={listItem} />)
+    render(
+      <VaultCard
+        item={listItem}
+        isSelected={false}
+        onOpenDetails={onOpenDetailsMock}
+        onCloseDetails={onCloseDetailsMock}
+      />,
+    )
 
-    expect(screen.getByText('[ LOCKED ]')).toBeTruthy()
-    expect(screen.getByRole('button', { name: '[OK]' })).toBeTruthy()
+    expect(screen.getByText('COPIED')).toBeTruthy()
     expect(screen.queryByText('body-secret')).toBeNull()
   })
 })
