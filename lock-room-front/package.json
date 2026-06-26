@@ -1,6 +1,7 @@
 {
   "name": "lock-room-front",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
