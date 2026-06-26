@@ -4,7 +4,7 @@ import { useVaultCard } from '@/hooks/use-vault-card'
 const formatId = (cuid: string) => `VT-${cuid.slice(-4).toUpperCase()}`
 
 export const VaultCard = ({ item }: { item: VaultListItem }) => {
-  const { title, body, revealed, copied, loadingBody, reveal, copy } = useVaultCard(item)
+  const { title, body, revealed, copying, copied, loadingBody, reveal, copy } = useVaultCard(item)
 
   return (
     <div
@@ -81,18 +81,19 @@ export const VaultCard = ({ item }: { item: VaultListItem }) => {
         <button
           type="button"
           onClick={copy}
+          disabled={copying}
           className="label-tag flex-shrink-0 transition-colors"
           style={{
             background: 'none',
             border: 'none',
-            cursor: 'pointer',
+            cursor: copying ? 'wait' : 'pointer',
             color: copied ? '#4ade80' : 'var(--text-muted)',
             padding: '0 2px',
           }}
-          onMouseEnter={(e) => { if (!copied) e.currentTarget.style.color = 'var(--text-primary)' }}
-          onMouseLeave={(e) => { if (!copied) e.currentTarget.style.color = 'var(--text-muted)' }}
+          onMouseEnter={(e) => { if (!copied && !copying) e.currentTarget.style.color = 'var(--text-primary)' }}
+          onMouseLeave={(e) => { if (!copied && !copying) e.currentTarget.style.color = 'var(--text-muted)' }}
         >
-          {copied ? '[OK]' : '[CPY]'}
+          {copied ? '[OK]' : copying ? '[...]' : '[CPY]'}
         </button>
       </div>
     </div>
