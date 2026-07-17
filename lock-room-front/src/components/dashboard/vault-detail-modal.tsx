@@ -13,6 +13,8 @@ type VaultDetailModalProps = {
   isDecryptFailed: boolean
   copied: boolean
   onCopy: () => Promise<void>
+  onRequestDelete: () => void
+  isDeleting: boolean
 }
 
 const formatDateTime = (isoDate: string): string => {
@@ -37,6 +39,8 @@ export const VaultDetailModal = ({
   isDecryptFailed,
   copied,
   onCopy,
+  onRequestDelete,
+  isDeleting,
 }: VaultDetailModalProps) => {
   useEffect(() => {
     if (!isOpen) return
@@ -137,6 +141,19 @@ export const VaultDetailModal = ({
               {revealed ? 'FULL_CONTENT_VIEW' : 'CONTENT_PROTECTED'}
             </p>
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="btn-ghost text-xs"
+                onClick={onRequestDelete}
+                disabled={isDeleting}
+                style={{
+                  opacity: isDeleting ? 0.6 : 1,
+                  borderColor: '#7f1d1d',
+                  color: '#fca5a5',
+                }}
+              >
+                {isDeleting ? '[ DELETING ]' : '[ DELETE_ENTRY ]'}
+              </button>
               <button
                 type="button"
                 className="btn-ghost text-xs"

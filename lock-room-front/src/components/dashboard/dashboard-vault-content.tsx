@@ -1,4 +1,5 @@
 import type { VaultListItem } from '@/services/vault'
+import type { DeleteVaultEntryRequest } from '@/hooks/use-delete-vault-entry'
 import { VaultCard } from './vault-card'
 
 type DashboardVaultContentProps = {
@@ -7,6 +8,8 @@ type DashboardVaultContentProps = {
   selectedCardId: string | null
   onOpenCard: (id: string) => void
   onCloseCard: () => void
+  onRequestDelete: (entry: DeleteVaultEntryRequest) => void
+  deletingId: string | null
 }
 
 export const DashboardVaultContent = ({
@@ -15,6 +18,8 @@ export const DashboardVaultContent = ({
   selectedCardId,
   onOpenCard,
   onCloseCard,
+  onRequestDelete,
+  deletingId,
 }: DashboardVaultContentProps) => {
   if (isLoading) {
     return (
@@ -60,6 +65,8 @@ export const DashboardVaultContent = ({
           isSelected={selectedCardId === item.cuid}
           onOpenDetails={onOpenCard}
           onCloseDetails={onCloseCard}
+          onRequestDelete={onRequestDelete}
+          isDeleting={deletingId === item.cuid}
         />
       ))}
     </div>

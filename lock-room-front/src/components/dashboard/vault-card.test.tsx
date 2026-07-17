@@ -23,17 +23,19 @@ const listItem: VaultListItem = {
   createdAt: '2026-04-05T00:00:00.000Z',
 }
 
-describe('VaultCard hidden copy UI', () => {
+describe('VaultCard actions', () => {
   const copyMock = vi.fn()
   const toggleRevealMock = vi.fn()
   const onOpenDetailsMock = vi.fn()
   const onCloseDetailsMock = vi.fn()
+  const onRequestDeleteMock = vi.fn()
 
   beforeEach(() => {
     copyMock.mockReset()
     toggleRevealMock.mockReset()
     onOpenDetailsMock.mockReset()
     onCloseDetailsMock.mockReset()
+    onRequestDeleteMock.mockReset()
 
     useVaultCardMock.mockReturnValue({
       title: 'ACHE-JA-SUPERADMIN',
@@ -61,6 +63,8 @@ describe('VaultCard hidden copy UI', () => {
         isSelected={false}
         onOpenDetails={onOpenDetailsMock}
         onCloseDetails={onCloseDetailsMock}
+        onRequestDelete={onRequestDeleteMock}
+        isDeleting={false}
       />,
     )
 
@@ -95,6 +99,8 @@ describe('VaultCard hidden copy UI', () => {
         isSelected={false}
         onOpenDetails={onOpenDetailsMock}
         onCloseDetails={onCloseDetailsMock}
+        onRequestDelete={onRequestDeleteMock}
+        isDeleting={false}
       />,
     )
 
@@ -123,10 +129,53 @@ describe('VaultCard hidden copy UI', () => {
         isSelected={false}
         onOpenDetails={onOpenDetailsMock}
         onCloseDetails={onCloseDetailsMock}
+        onRequestDelete={onRequestDeleteMock}
+        isDeleting={false}
       />,
     )
 
     expect(screen.getByText('COPIED')).toBeTruthy()
     expect(screen.queryByText('body-secret')).toBeNull()
+  })
+
+  it('requests deletion from the card without opening details', () => {
+    render(
+      <VaultCard
+        item={listItem}
+        isSelected={false}
+        onOpenDetails={onOpenDetailsMock}
+        onCloseDetails={onCloseDetailsMock}
+        onRequestDelete={onRequestDeleteMock}
+        isDeleting={false}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete entry' }))
+
+    expect(onRequestDeleteMock).toHaveBeenCalledTimes(1)
+    expect(onRequestDeleteMock).toHaveBeenCalledWith({
+      id: 'vault-entry-1234',
+      formattedId: 'VT-1234',
+      title: 'ACHE-JA-SUPERADMIN',
+    })
+    expect(onOpenDetailsMock).not.toHaveBeenCalled()
+  })
+
+  it('disables the delete action while the entry is being deleted', () => {
+    render(
+      <VaultCard
+        item={listItem}
+        isSelected={false}
+        onOpenDetails={onOpenDetailsMock}
+        onCloseDetails={onCloseDetailsMock}
+        onRequestDelete={onRequestDeleteMock}
+        isDeleting
+      />,
+    )
+
+    const button = screen.getByRole('button', { name: 'Delete entry' })
+
+    expect(button.hasAttribute('disabled')).toBe(true)
+    expect(screen.getByText('DELETING')).toBeTruthy()
   })
 })

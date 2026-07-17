@@ -1,7 +1,8 @@
 // @refresh reset
-import { Copy, Eye, EyeOff, Expand } from 'lucide-react'
-import type { VaultListItem } from '@/services/vault'
+import { Copy, Eye, EyeOff, Expand, Trash2 } from 'lucide-react'
+import type { DeleteVaultEntryRequest } from '@/hooks/use-delete-vault-entry'
 import { useVaultCard } from '@/hooks/use-vault-card'
+import type { VaultListItem } from '@/services/vault'
 import { VaultDetailModal } from './vault-detail-modal'
 
 const formatId = (cuid: string) => `VT-${cuid.slice(-4).toUpperCase()}`
@@ -11,6 +12,8 @@ type VaultCardProps = {
   isSelected: boolean
   onOpenDetails: (id: string) => void
   onCloseDetails: () => void
+  onRequestDelete: (entry: DeleteVaultEntryRequest) => void
+  isDeleting: boolean
 }
 
 const formatCreatedAt = (isoDate: string): string => {
@@ -24,6 +27,8 @@ export const VaultCard = ({
   isSelected,
   onOpenDetails,
   onCloseDetails,
+  onRequestDelete,
+  isDeleting,
 }: VaultCardProps) => {
   const {
     title,
@@ -39,19 +44,29 @@ export const VaultCard = ({
   } = useVaultCard(item)
 
   const preview = !revealed
-    ? '••••••••••••••••'
+    ? '................'
     : loadingBody
       ? 'LOADING_CONTENT'
       : isBodyDecryptFailed
         ? 'DECRYPT_FAILED'
         : body ?? 'NO_CONTENT'
 
+  const formattedId = formatId(item.cuid)
+
+  const requestDelete = () => {
+    onRequestDelete({
+      id: item.cuid,
+      formattedId,
+      title,
+    })
+  }
+
   return (
     <>
       <div
         role="button"
         tabIndex={0}
-        aria-label={`Open details for ${formatId(item.cuid)}`}
+        aria-label={`Open details for ${formattedId}`}
         aria-haspopup="dialog"
         aria-expanded={isSelected}
         className="fade-in"
@@ -101,7 +116,7 @@ export const VaultCard = ({
             [ ENTRY ]
           </span>
           <span className="label-tag" style={{ color: 'var(--text-muted)' }}>
-            {formatId(item.cuid)}
+            {formattedId}
           </span>
         </div>
 
@@ -115,7 +130,7 @@ export const VaultCard = ({
             lineHeight: 1.1,
           }}
         >
-          {isTitleDecryptFailed ? 'DECRYPT_FAILED' : title ?? '···'}
+          {isTitleDecryptFailed ? 'DECRYPT_FAILED' : title ?? '...'}
         </h3>
 
         <p className="m-0 label-tag mb-2" style={{ color: 'var(--text-muted)' }}>
@@ -236,6 +251,38 @@ export const VaultCard = ({
               <Copy size={14} strokeWidth={1.6} />
               <span>{copied ? 'COPIED' : copying ? 'COPYING' : 'COPY'}</span>
             </button>
+
+            <button
+              type="button"
+              disabled={isDeleting}
+              className="label-tag flex items-center gap-1.5 transition-colors"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: isDeleting ? 'wait' : 'pointer',
+                color: '#fca5a5',
+                padding: '0',
+                whiteSpace: 'nowrap',
+                opacity: isDeleting ? 0.7 : 1,
+              }}
+              onClick={(event) => {
+                event.stopPropagation()
+                requestDelete()
+              }}
+              onKeyDown={(event) => {
+                event.stopPropagation()
+              }}
+              onMouseEnter={(event) => {
+                if (!isDeleting) event.currentTarget.style.color = '#fee2e2'
+              }}
+              onMouseLeave={(event) => {
+                if (!isDeleting) event.currentTarget.style.color = '#fca5a5'
+              }}
+              aria-label="Delete entry"
+            >
+              <Trash2 size={14} strokeWidth={1.6} />
+              <span>{isDeleting ? 'DELETING' : 'DELETE'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -246,13 +293,15 @@ export const VaultCard = ({
         title={title}
         body={body}
         createdAt={item.createdAt}
-        formattedId={formatId(item.cuid)}
+        formattedId={formattedId}
         revealed={revealed}
         onToggleReveal={toggleReveal}
         isLoading={loadingBody}
         isDecryptFailed={isBodyDecryptFailed}
         copied={copied}
         onCopy={copy}
+        onRequestDelete={requestDelete}
+        isDeleting={isDeleting}
       />
     </>
   )

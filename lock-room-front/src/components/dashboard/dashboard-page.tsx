@@ -6,18 +6,40 @@ import { DashboardTopBar } from './dashboard-topbar'
 import { DashboardVaultContent } from './dashboard-vault-content'
 import { DashboardFooterMetrics } from './dashboard-footer-metrics'
 import { NewEntryModal } from './new-entry-modal'
+import { DeleteVaultConfirmModal } from './delete-vault-confirm-modal'
 import { getLatestCreatedAt } from './dashboard-utils'
+import { useDeleteVaultEntry } from '@/hooks/use-delete-vault-entry'
 
 export const DashboardPage = () => {
   const { data: items = [], isLoading } = useQuery(vaultQueries.list())
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false)
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+  const {
+    pendingEntry,
+    isDeleting,
+    error: deleteError,
+    requestDelete,
+    cancelDelete,
+    confirmDelete,
+  } = useDeleteVaultEntry({
+    selectedCardId,
+    onCloseSelectedCard: () => setSelectedCardId(null),
+  })
 
   const latestCreatedAt = useMemo(() => getLatestCreatedAt(items), [items])
 
   return (
     <div className="flex" style={{ minHeight: '100vh' }}>
       {isNewEntryOpen && <NewEntryModal onClose={() => setIsNewEntryOpen(false)} />}
+      {pendingEntry && (
+        <DeleteVaultConfirmModal
+          entry={pendingEntry}
+          isDeleting={isDeleting}
+          error={deleteError}
+          onCancel={cancelDelete}
+          onConfirm={confirmDelete}
+        />
+      )}
       <DashboardSidebar />
 
       <div className="flex flex-col flex-1" style={{ overflow: 'hidden' }}>
@@ -60,6 +82,8 @@ export const DashboardPage = () => {
             selectedCardId={selectedCardId}
             onOpenCard={setSelectedCardId}
             onCloseCard={() => setSelectedCardId(null)}
+            onRequestDelete={requestDelete}
+            deletingId={isDeleting ? pendingEntry?.id ?? null : null}
           />
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '2rem 0 1rem' }} />
